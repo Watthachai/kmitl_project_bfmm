@@ -5,7 +5,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import os
 from werkzeug.utils import secure_filename
 
-UPLOAD_FOLDER = r'D:\KMITL\final_project_kmitl\เริ่มใหม่เทอม_2\BFMM\kmitl_project_bfmm\backend\static\images\menus'
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'static', 'images', 'menus')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 # ตรวจสอบว่าไฟล์มีนามสกุลที่อนุญาตไหม

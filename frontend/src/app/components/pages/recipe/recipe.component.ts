@@ -59,7 +59,7 @@ export class RecipeComponent implements OnInit {
 
   getIngredientPackName(packId: number): string {
     const found = this.ingredientPacks.find(p => p.id === packId);
-    return found ? found.name : ID: ${packId};
+    return found ? found.name : `ID: ${packId}`;
   }  
 
   loadIngredientPacks() {
@@ -132,6 +132,7 @@ export class RecipeComponent implements OnInit {
       console.error("ไม่พบ element modal addMenuIngredientModal");
       return;
     }
+  
     this.service.getAllIngredients().subscribe(res => {
       console.log("วัตถุดิบทั้งหมด:", res);
       this.ingredients = res;
@@ -227,7 +228,7 @@ export class RecipeComponent implements OnInit {
   }
 
   selectMenuTypesById(id: any) {
-    let url = /recipe/${id};
+    let url = `/recipe/${id}`;
     console.log('Navigating to:', url);
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       this.router.navigate([url]);
@@ -347,11 +348,11 @@ export class RecipeComponent implements OnInit {
         description: stepData.description
       };
   
-      console.log(Creating new step ${stepPayload.step}:, stepPayload);
+      console.log(`Creating new step ${stepPayload.step}:`, stepPayload);
   
       try {
         const stepRes = await this.service.createStep(stepPayload).toPromise();
-        console.log(Step ${stepPayload.step} created successfully!, stepRes);
+        console.log(`Step ${stepPayload.step} created successfully!`, stepRes);
       } catch (stepErr) {
         console.error('Error creating step:', stepErr);
       }
@@ -384,7 +385,7 @@ export class RecipeComponent implements OnInit {
 
   getIngredientName(ingredientId: number): string {
     const found = this.ingredients.find(i => i.id === ingredientId);
-    return found ? found.name : ID: ${ingredientId};
+    return found ? found.name : `ID: ${ingredientId}`;
   }  
   
   openEditMenuModal(menu: any) {
@@ -488,15 +489,15 @@ export class RecipeComponent implements OnInit {
             menu_id: this.editedMenu.id
         };
 
-        console.log(Sending update request for Step ID ${stepId}:, stepPayload);
+        console.log(`Sending update request for Step ID ${stepId}:`, stepPayload);
 
         this.service.updateStep(stepId, stepPayload).subscribe(
             (res) => {
-                console.log(Step ${stepId} updated successfully, res);
+                console.log(`Step ${stepId} updated successfully`, res);
                 this.getStepByMenuId(this.editedMenu.id);
             },
             (error) => {
-                console.error(Error updating step ${stepId}:, error);
+                console.error(`Error updating step ${stepId}:`, error);
                 Swal.fire('Error', 'ไม่สามารถอัพเดทขั้นตอนได้', 'error');
             }
         );
@@ -520,10 +521,10 @@ export class RecipeComponent implements OnInit {
   
       this.service.updateMenuIngredientPack(pack.id, payload).subscribe(
         (res) => {
-          console.log(อัปเดต Ingredient Pack ID ${pack.id} แล้ว, res);
+          console.log(`อัปเดต Ingredient Pack ID ${pack.id} แล้ว`, res);
         },
         (err) => {
-          console.error(ไม่สามารถอัปเดต Ingredient Pack ID ${pack.id}, err);
+          console.error(`ไม่สามารถอัปเดต Ingredient Pack ID ${pack.id}`, err);
           Swal.fire('Error', 'ไม่สามารถอัปเดต Ingredient Pack ได้', 'error');
         }
       );
@@ -621,11 +622,11 @@ export class RecipeComponent implements OnInit {
         unit: ing.unit
       };
   
-      console.log(ส่งอัปเดตวัตถุดิบเดี่ยว ID ${ingredientId}:, payload);
+      console.log(`ส่งอัปเดตวัตถุดิบเดี่ยว ID ${ingredientId}:`, payload);
   
       this.service.updateMenuIngredient(ingredientId, payload).subscribe(
         (res) => {
-          console.log(วัตถุดิบ ID ${ingredientId} อัปเดตสำเร็จ, res);
+          console.log(`วัตถุดิบ ID ${ingredientId} อัปเดตสำเร็จ`, res);
           this.service.getMenuIngredients(this.editedMenu.id).subscribe((res) => {
             this.menuIngredients = res.filter((item: any) => item.menu_id === this.editedMenu.id)
               .map((item: any) => ({
@@ -635,8 +636,8 @@ export class RecipeComponent implements OnInit {
           });
         },
         (err) => {
-          console.error(อัปเดตวัตถุดิบ ID ${ingredientId} ล้มเหลว, err);
-          Swal.fire('Error', ไม่สามารถอัปเดตวัตถุดิบ ID ${ingredientId} ได้, 'error');
+          console.error(`อัปเดตวัตถุดิบ ID ${ingredientId} ล้มเหลว`, err);
+          Swal.fire('Error', `ไม่สามารถอัปเดตวัตถุดิบ ID ${ingredientId} ได้`, 'error');
         }
       );
     });
@@ -683,7 +684,7 @@ export class RecipeComponent implements OnInit {
           for (const step of this.steps) {
             if (step.id) {
               await this.service.deleteStep(step.id).toPromise();
-              console.log(ลบ Step ID ${step.id} สำเร็จ);
+              console.log(`ลบ Step ID ${step.id} สำเร็จ`);
             }
           }
         }
@@ -691,7 +692,7 @@ export class RecipeComponent implements OnInit {
           for (const pack of this.menuIngredientPacks) {
             if (pack.id) {
               await this.service.deleteMenuIngredientPack(pack.id).toPromise();
-              console.log(ลบ Ingredient Pack ID ${pack.id} สำเร็จ);
+              console.log(`ลบ Ingredient Pack ID ${pack.id} สำเร็จ`);
             }
           }
         }
@@ -699,16 +700,15 @@ export class RecipeComponent implements OnInit {
           for (const ing of this.menuIngredients) {
             if (ing.MenuIngredients_id) {
               await this.service.deleteMenuIngredient(ing.MenuIngredients_id).toPromise();
-              console.log(ลบวัตถุดิบ ID ${ing.MenuIngredients_id} สำเร็จ);
+              console.log(`ลบวัตถุดิบ ID ${ing.MenuIngredients_id} สำเร็จ`);
             }
           }
         }
         await this.service.deleteMenu(menuId).toPromise();
-        console.log(ลบเมนูหลัก ID ${menuId} สำเร็จ);
+        console.log(`ลบเมนูหลัก ID ${menuId} สำเร็จ`);
   
         Swal.fire("Deleted!", "ลบเมนูและข้อมูลที่เกี่ยวข้องแล้ว", "success");
-        this.loadMenusById(this.selectedId);  
-
+        this.loadMenusById(this.selectedId);
   
         const editModal = (window as any).bootstrap.Modal.getInstance(document.getElementById('editMenuModal'));
         if (editModal) editModal.hide();
