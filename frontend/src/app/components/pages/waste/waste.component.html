@@ -1,0 +1,45 @@
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <h4 class="mb-3 text-brown">
+            Waste History <span class="date-text">วันที่ {{ selectedDate | date: 'dd/MM/yyyy' }}</span>
+        </h4>
+
+        <!-- Date Picker -->
+        <input type="date" class="form-control w-auto" [(ngModel)]="selectedDate" (change)="fetchWasteByDate()">
+    </div>
+
+    <div class="table-responsive" *ngIf="!isDataEmpty; else noData">
+        <table class="table table-striped waste-table">
+            <thead>
+                <tr>
+                    <th>ชื่อเมนู</th>
+                    <th>จำนวน</th>
+                    <th>หน่วย</th>
+                    <th>ราคา</th>
+                    <th>วันที่ทิ้ง</th>
+                    <th>สาเหตุ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="table-warning">
+                    <td colspan="3" class="text-end fw-bold">ยอดรวม</td>
+                    <td class="fw-bold">{{ totalPrice | currency:'THB' }}</td>
+                    <td colspan="2"></td>
+                </tr>
+                <tr *ngFor="let item of waste; let i = index">
+                    <td>{{ item.item_name }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.unit }}</td>
+                    <td>{{ item.price | currency:'THB' }}</td>
+                    <td>{{ item.waste_date | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>{{ item.reason }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <ng-template #noData>
+        <div class="text-center text-muted mt-3">
+            ไม่มีข้อมูล
+        </div>
+    </ng-template>
+</div>
