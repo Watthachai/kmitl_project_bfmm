@@ -271,9 +271,14 @@ export class KitchenOrderComponent implements OnInit {
     const latestStatusOrder = orderItem.status_order;
 
     if (latestStatusOrder < 2 && latestStatusServe === 0) {
-      console.warn('Cannot change serve status before order status is 2');
+      Swal.fire({
+        icon: 'warning',
+        title: 'ไม่สามารถเปลี่ยนสถานะได้',
+        text: 'ไม่สามารถเปลี่ยนสถานะเสิร์ฟได้เนื่องจากอาหารยังปรุงไม่เสร็จ',
+        confirmButtonText: 'ตกลง'
+      });
       return;
-    }
+    }    
 
     const operation = latestStatusServe === 1 ? 'back' : 'next';
     const payload = { order: orderId, order_item: orderItemId, operation: operation };
