@@ -295,68 +295,107 @@ def change_status_order(ai_data):
         print("❤❤❤ เริ่มต้นเปลี่ยนสถานะคำสั่งซื้อ ❤❤❤")
         print(f"Data received from AI: {ai_data}")
 
-        # required_keys = ['TABLE', 'COMMAND', 'FOOD']
-        # valid, message = validate_input(ai_data, required_keys)
-        # if not valid:
-        #     return jsonify({"message": message}), 400
+        required_keys = ['TABLE', 'COMMAND', 'FOOD']
+        valid, message = validate_input(ai_data, required_keys)
+        if not valid:
+            print(f"Invalid input: {message}")
+            return jsonify({"message": message}), 400
 
         table_ids = ai_data['TABLE']
         command_type = ai_data['COMMAND']
         food_names = ai_data['FOOD']
         question = ai_data.get('QUESTION', False)
 
+        print(f"Table IDs: {table_ids}, Command Type: {command_type}, Food Names: {food_names}, Question: {question}")
+
         # สถานะเริ่มต้น
         status_change = 0
 
         if question:
+            print("Question received, returning status_change 2")
             return jsonify({"status_change": 2}), 200
 
         if command_type and food_names and table_ids:
+            print("Valid input, checking different cases")
+
             # ตรวจสอบกรณีต่างๆ
             if len(food_names) > 1 and len(table_ids) == 1:
+                print(f"Multiple food items ({len(food_names)}) but only one table ID ({len(table_ids)})")
                 for food in food_names:
                     table_id = table_ids[0]
                     menu = get_menu_id(food)
                     if menu:
+                        print(f"Menu found for food: {food}, table_id: {table_id}")
                         order_id = get_order_id(table_id)
                         if order_id:
+                            print(f"Order ID found for table_id {table_id}: {order_id}")
                             status_change = process_status_change(command_type, food, table_id, order_id)
+                        else:
+                            print(f"No order ID found for table_id {table_id}")
+                    else:
+                        print(f"No menu found for food: {food}")
             elif len(food_names) == 1 and len(table_ids) > 1:
+                print(f"Single food item but multiple table IDs ({len(table_ids)})")
                 for table_id in table_ids:
                     food = food_names[0]
                     menu = get_menu_id(food)
                     if menu:
+                        print(f"Menu found for food: {food}, table_id: {table_id}")
                         order_id = get_order_id(table_id)
                         if order_id:
+                            print(f"Order ID found for table_id {table_id}: {order_id}")
                             status_change = process_status_change(command_type, food, table_id, order_id)
+                        else:
+                            print(f"No order ID found for table_id {table_id}")
+                    else:
+                        print(f"No menu found for food: {food}")
             elif len(food_names) == 1 and len(table_ids) == 1:
+                print(f"One food item and one table ID, food: {food_names[0]}, table_id: {table_ids[0]}")
                 table_id = table_ids[0]
                 food = food_names[0]
                 menu = get_menu_id(food)
                 if menu:
+                    print(f"Menu found for food: {food}, table_id: {table_id}")
                     order_id = get_order_id(table_id)
                     if order_id:
+                        print(f"Order ID found for table_id {table_id}: {order_id}")
                         status_change = process_status_change(command_type, food, table_id, order_id)
+                    else:
+                        print(f"No order ID found for table_id {table_id}")
+                else:
+                    print(f"No menu found for food: {food}")
             elif len(food_names) == len(table_ids):
+                print(f"Food names and table IDs match in length ({len(food_names)})")
                 for i in range(len(food_names)):
                     food = food_names[i]
                     table_id = table_ids[i]
                     menu = get_menu_id(food)
                     if menu:
+                        print(f"Menu found for food: {food}, table_id: {table_id}")
                         order_id = get_order_id(table_id)
                         if order_id:
+                            print(f"Order ID found for table_id {table_id}: {order_id}")
                             status_change = process_status_change(command_type, food, table_id, order_id)
+                        else:
+                            print(f"No order ID found for table_id {table_id}")
+                    else:
+                        print(f"No menu found for food: {food}")
             else:
+                print("The system does not support this combination of food names and table IDs.")
                 status_change = 0  # ระบบไม่รองรับ
 
             if status_change == 1:
+                print("Status change successful")
                 return jsonify({"status_change": 1}), 200
             elif status_change == 0:
+                print("Status change failed")
                 return jsonify({"status_change": 0}), 400
 
+        print(f"Final status change: {status_change}")
         return jsonify({"status_change": status_change}), 200
 
     except Exception as e:
+        print(f"Error occurred: {str(e)}")
         return jsonify({"message": str(e)}), 500
 
 
