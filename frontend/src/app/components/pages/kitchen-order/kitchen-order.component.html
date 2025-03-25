@@ -61,13 +61,3 @@
         </div>
     </div>
 </div>
-
-<div *ngIf="resFromModel; else noData">
-    <p>คำสั่ง: {{ resFromModel.result.COMMAND }}</p>
-    <p>อาหาร: {{ resFromModel.result.FOOD?.[0] }}</p>
-    <p>โต๊ะที่: {{ resFromModel.result.TABLE?.[0] }}</p>
-</div>
-
-<ng-template #noData>
-    <p>ยังไม่มีข้อมูล</p>
-</ng-template>

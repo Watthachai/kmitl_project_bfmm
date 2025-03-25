@@ -295,10 +295,10 @@ def change_status_order(ai_data):
         print("❤❤❤ เริ่มต้นเปลี่ยนสถานะคำสั่งซื้อ ❤❤❤")
         print(f"Data received from AI: {ai_data}")
 
-        required_keys = ['TABLE', 'COMMAND', 'FOOD']
-        valid, message = validate_input(ai_data, required_keys)
-        if not valid:
-            return jsonify({"message": message}), 400
+        # required_keys = ['TABLE', 'COMMAND', 'FOOD']
+        # valid, message = validate_input(ai_data, required_keys)
+        # if not valid:
+        #     return jsonify({"message": message}), 400
 
         table_ids = ai_data['TABLE']
         command_type = ai_data['COMMAND']
