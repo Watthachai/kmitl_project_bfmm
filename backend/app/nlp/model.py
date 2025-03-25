@@ -200,12 +200,12 @@ def validate_input(data, required_keys):
             return False, f"{key} is required!"
     return True, ""
 
+
 def stock_manager(menu_id, qty):
-    """Manages stock updates for ingredients and ingredient packs."""
     try:
         print("📦 เริ่มระบบ stock_manager...")
 
-        # --- 1. Manage stock for individual ingredients (menuingredients) ---
+        # --- 1. จัดการ stock วัตถุดิบจาก table 'menuingredients' ---
         print(f"🔍 ดึงวัตถุดิบเดี่ยวของ menu_id: {menu_id}")
         menu_ingredients = db.session.execute(
             text("SELECT ingredient_id, volume FROM menuingredients WHERE menu_id = :menu_id"),
@@ -239,9 +239,9 @@ def stock_manager(menu_id, qty):
                 )
             else:
                 print(f"❗ ไม่พบ ingredient_id {ingredient_id} ใน stock")
-                return {"status": 404, "message": f"Ingredient with id {ingredient_id} not found!"}
+                return jsonify({"message": f"Ingredient with id {ingredient_id} not found!"}), 404
 
-        # --- 2. Manage stock for ingredient packs (menuingredientpack) ---
+        # --- 2. จัดการ stock จากระบบ Pack (menuingredientpack) ---
         print(f"🔍 ดึงวัตถุดิบแบบ Pack ของ menu_id: {menu_id}")
         menu_ingredient_packs = db.session.execute(
             text("SELECT ingredient_pack_id, qty FROM menuingredientpack WHERE menu_id = :menu_id"),
@@ -255,12 +255,6 @@ def stock_manager(menu_id, qty):
 
         ingredient_pack_stocks = []
         if pack_ids:
-
-            # ingredient_pack_stocks = db.session.execute(
-            #         text("SELECT id, stock FROM ingredientpackitems WHERE pack_id IN (:pack_ids)"),  # Corrected table name
-            #         {"pack_ids": pack_ids}  # Use a dictionary for parameters
-            #     ).mappings().fetchall()
-            
             ingredient_pack_stocks = db.session.execute(
                 text(f"SELECT id, stock FROM ingredientpack WHERE id IN ({', '.join(map(str, pack_ids))})")
             ).mappings().fetchall()
@@ -281,7 +275,7 @@ def stock_manager(menu_id, qty):
                 )
             else:
                 print(f"❗ ไม่พบ ingredient_pack_id {pack_id} ใน stock")
-                return {"status": 404, "message": f"Ingredient Pack with id {pack_id} not found!"}
+                return jsonify({"message": f"Ingredient Pack with id {pack_id} not found!"}), 404
 
         db.session.commit()
         print("✅ stock_manager ทำงานสำเร็จทั้งหมด")
@@ -296,9 +290,7 @@ def stock_manager(menu_id, qty):
         print(f"❌ Unexpected Error: {str(e)}")
         return {"status": 500, "message": f"Unexpected Error: {str(e)}"}
 
-
 def change_status_order(ai_data):
-    """Changes the status of an order item based on AI input."""
     try:
         print("❤❤❤ เริ่มต้นเปลี่ยนสถานะคำสั่งซื้อ ❤❤❤")
         print(f"Data received from AI: {ai_data}")
@@ -308,90 +300,128 @@ def change_status_order(ai_data):
         if not valid:
             return jsonify({"message": message}), 400
 
-        table_id = ai_data['TABLE'][0]
+        table_ids = ai_data['TABLE']
         command_type = ai_data['COMMAND']
-        food_name = ai_data['FOOD'][0]
+        food_names = ai_data['FOOD']
+        question = ai_data.get('QUESTION', False)
 
-        if command_type not in ['COMMAND_1', 'COMMAND_2']:
-            return jsonify({"message": "'command_type' must be either 'COMMAND_1' or 'COMMAND_2'!"}), 400
+        # สถานะเริ่มต้น
+        status_change = 0
 
-        # Find menu_id from food_name
-        menu = db.session.execute(
-            text("SELECT id FROM menu WHERE name = :food_name"),
-            {"food_name": food_name}
-        ).mappings().fetchone()
+        if question:
+            return jsonify({"status_change": 2}), 200
 
-        if not menu:
-            return jsonify({"message": "Food not found in menu!"}), 404
+        if command_type and food_names and table_ids:
+            # ตรวจสอบกรณีต่างๆ
+            if len(food_names) > 1 and len(table_ids) == 1:
+                for food in food_names:
+                    table_id = table_ids[0]
+                    menu = get_menu_id(food)
+                    if menu:
+                        order_id = get_order_id(table_id)
+                        if order_id:
+                            status_change = process_status_change(command_type, food, table_id, order_id)
+            elif len(food_names) == 1 and len(table_ids) > 1:
+                for table_id in table_ids:
+                    food = food_names[0]
+                    menu = get_menu_id(food)
+                    if menu:
+                        order_id = get_order_id(table_id)
+                        if order_id:
+                            status_change = process_status_change(command_type, food, table_id, order_id)
+            elif len(food_names) == 1 and len(table_ids) == 1:
+                table_id = table_ids[0]
+                food = food_names[0]
+                menu = get_menu_id(food)
+                if menu:
+                    order_id = get_order_id(table_id)
+                    if order_id:
+                        status_change = process_status_change(command_type, food, table_id, order_id)
+            elif len(food_names) == len(table_ids):
+                for i in range(len(food_names)):
+                    food = food_names[i]
+                    table_id = table_ids[i]
+                    menu = get_menu_id(food)
+                    if menu:
+                        order_id = get_order_id(table_id)
+                        if order_id:
+                            status_change = process_status_change(command_type, food, table_id, order_id)
+            else:
+                status_change = 0  # ระบบไม่รองรับ
 
-        menu_id = menu['id']
+            if status_change == 1:
+                return jsonify({"status_change": 1}), 200
+            elif status_change == 0:
+                return jsonify({"status_change": 0}), 400
 
-        # Find order_id from table_id
-        order_query = db.session.query(Order).filter_by(table_id=table_id).first()  # Assuming status 0 is active
-        if not order_query:
-            return jsonify({"message": f"No active order found for table {table_id}"}), 404
+        return jsonify({"status_change": status_change}), 200
 
-        order_id = order_query.order_id
-
-        # Find existing status_order
-        existing_status_result = db.session.execute(
-            text("SELECT status_order FROM orderitem WHERE menu_id = :menu_id AND order_id = :order_id"),
-            {"menu_id": menu_id, "order_id": order_id}
-        ).mappings().fetchone()
-
-
-        if not existing_status_result:
-             return jsonify({"message": "Order item not found!"}), 404
-
-        current_status = existing_status_result["status_order"]
-        print(f"สถานะเดิมของ orderitem: {current_status}")
-
-        # Map command to new status
-        status_mapping = {'COMMAND_1': 1, 'COMMAND_2': 2}
-        new_status = status_mapping.get(command_type)
-
-        # Check for status reduction (not allowed)
-        if new_status <= current_status:
-            return jsonify({"message": "ไม่อนุญาตให้ลดสถานะของคำสั่งซื้อ!"}), 400
-
-        # Update status
-        db.session.execute(
-            text("UPDATE orderitem SET status_order = :status WHERE menu_id = :menu_id AND order_id = :order_id"),
-            {"status": new_status, "menu_id": menu_id, "order_id": order_id}
-        )
-        db.session.commit()
-
-        print("✅ อัปเดตสถานะสำเร็จ!")
-
-        # Get qty for stock_manager
-        qty_result = db.session.execute(
-            text("SELECT menu_qty FROM orderitem WHERE menu_id = :menu_id AND order_id = :order_id"),
-            {"menu_id": menu_id, "order_id": order_id}
-        ).mappings().fetchone()
-
-        if not qty_result:
-            print("ไม่พบจำนวน qty ของ orderitem")
-            return jsonify({"message": "ไม่พบจำนวน qty ของ orderitem"}), 404
-
-        qty = qty_result["menu_qty"]
-
-        # Call stock_manager
-        stock_result = stock_manager(menu_id, qty)
-
-        if stock_result["status"] != 200:
-            print("Status updated, but stock error occurred!")
-            return jsonify({"message": "Status updated, but stock error occurred!", "stock_result": stock_result}), 500
-
-        print("Status updated successfully")
-        return jsonify({"message": "Status updated successfully", "stock_result": stock_result}), 200
-
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        print(f"SQLAlchemyError: {e}")
-        return jsonify({"message": str(e)}), 500
     except Exception as e:
-        print(f"Exception: {e}")
         return jsonify({"message": str(e)}), 500
+
+
+def get_menu_id(food_name):
+    menu = db.session.execute(
+        text("SELECT id FROM menu WHERE name = :food_name"),
+        {"food_name": food_name}
+    ).mappings().fetchone()
+
+    if not menu:
+        return None
+    return menu['id']
+
+
+def get_order_id(table_id):
+    order_query = db.session.query(Order).filter_by(table_id=table_id).first()
+    if not order_query:
+        return None
+    return order_query.order_id
+
+
+def process_status_change(command_type, food, table_id, order_id):
+    # หา menu_id จาก food_name
+    menu_id = get_menu_id(food)
+    if not menu_id:
+        return 0
+
+    # หา status_order เดิม
+    existing_status = db.session.execute(
+        text("SELECT status_order FROM orderitem WHERE menu_id = :menu_id AND order_id = :order_id"),
+        {"menu_id": menu_id, "order_id": order_id}
+    ).mappings().fetchone()
+
+    if not existing_status:
+        return 0
+
+    current_status = existing_status["status_order"]
+    status_mapping = {'COMMAND_1': 1, 'COMMAND_2': 2}
+    new_status = status_mapping.get(command_type)
+
+    # เช็กว่ามีการลดสถานะไหม (ไม่อนุญาต)
+    if new_status <= current_status:
+        return 0
+
+    # อัปเดตสถานะ
+    db.session.execute(
+        text("UPDATE orderitem SET status_order = :status WHERE menu_id = :menu_id AND order_id = :order_id"),
+        {"status": new_status, "menu_id": menu_id, "order_id": order_id}
+    )
+    db.session.commit()
+
+    # ถ้า COMMAND_1 จะต้องตัดสต็อก
+    if command_type == "COMMAND_1":
+        qty_result = db.session.execute(
+            text("SELECT qty FROM orderitem WHERE menu_id = :menu_id AND order_id = :order_id"),
+            {"menu_id": menu_id, "order_id": order_id}
+        ).mappings().fetchone()
+
+        if qty_result:
+            qty = qty_result["qty"]
+            stock_result = stock_manager(menu_id, qty)
+            if stock_result["status"] != 200:
+                return 0
+
+    return 1
 
 
 # --- Main Audio Upload Endpoint ---
