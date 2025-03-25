@@ -76,7 +76,7 @@ export class KitchenOrderComponent implements OnInit {
                   this.fetchOrderItems();
                   this.resFromModel
               });
-          }, 5000);
+          }, 10000);
       });
     }  
     this.service.getAllMenuTypes().subscribe((res) => {

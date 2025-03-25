@@ -44,23 +44,6 @@ export class TableStatusComponent implements OnInit {
       });
     });
 
-    if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined') {
-      this.ngZone.runOutsideAngular(() => {
-        setInterval(() => {
-            this.ngZone.run(() => {
-              this.tableStatusService.getAllPayment().subscribe((res) => {
-                this.payment = res;
-                  console.log(this.payment);
-              });
-              this.tableStatusService.getAllOrder().subscribe((res) => {
-                this.order = res;
-                console.log("Updated Order Data:", this.order);
-              });
-            });
-        }, 3000);
-      });
-    }  
-
     this.tableStatusService.getAllPayment().subscribe((res) => {
       this.payment = res;
       console.log(this.payment);
@@ -70,6 +53,20 @@ export class TableStatusComponent implements OnInit {
       this.order = res;
       console.log(this.order);
     });
+  }
+
+  async fetchOrderAndPayment(): Promise<void> {
+    try {
+      const [paymentRes, orderRes] = await Promise.all([
+        lastValueFrom(this.tableStatusService.getAllPayment()),
+        lastValueFrom(this.tableStatusService.getAllOrder())
+      ]);
+      this.payment = paymentRes;
+      this.order = orderRes;
+      console.log("อัปเดตข้อมูล Payment และ Order แล้ว:", this.payment, this.order);
+    } catch (err) {
+      console.error("ไม่สามารถโหลดข้อมูล payment/order ได้:", err);
+    }
   }
 
   async updateTable(table: any) {
@@ -83,36 +80,42 @@ export class TableStatusComponent implements OnInit {
       return;
     }
   
-    const result = await Swal.fire({
-      title: 'คุณแน่ใจหรือไม่?',
-      text: `คุณต้องการเปลี่ยนสถานะโต๊ะเป็น "${table.status}" หรือไม่?`,
+    const confirmResult = await Swal.fire({
+      title: 'ยืนยันการเปลี่ยนสถานะ',
+      text: `คุณต้องการเปลี่ยนสถานะโต๊ะเป็น "${table.status}" ใช่หรือไม่?`,
       icon: 'question',
       showCancelButton: true,
       confirmButtonText: 'ยืนยัน',
       cancelButtonText: 'ยกเลิก'
     });
   
-    if (!result.isConfirmed) return;
+    if (!confirmResult.isConfirmed) return;
   
+    await this.fetchOrderAndPayment();
     const relatedOrder = this.order.find((o: any) => o.table_id === table.table_id);
   
     if (table.status === 'disable' && relatedOrder) {
       if (!relatedOrder.payment_id) {
-        Swal.fire('แจ้งเตือน', 'โต๊ะนี้มีการสั่งอาหาร แต่ยังไม่ได้ชำระเงิน', 'warning');
+        await Swal.fire('ไม่สามารถปิดโต๊ะได้', 'ลูกค้ายังไม่ได้ชำระเงิน กรุณาชำระเงินก่อนปิดโต๊ะ', 'warning');
         return;
       }
   
-      try {
-        await this.processPayment(relatedOrder.payment_id, 'PromptPay');
-      } catch (error) {
-        console.error('Payment process failed:', error);
-        return; // ถ้าชำระเงินไม่สำเร็จ หยุดที่นี่
+      // ให้ผู้ใช้เลือกช่องทางการชำระเงินแทนที่จะบังคับใช้ PromptPay
+      await this.selectPaymentMethod(table);
+  
+      // เช็คว่า payment หลังจากเลือกชำระสำเร็จหรือยัง
+      const updatedOrder = this.order.find((o: any) => o.table_id === table.table_id);
+      if (!updatedOrder || !updatedOrder.payment_id || !updatedOrder.payment_method) {
+        await Swal.fire('ไม่สามารถปิดโต๊ะได้', 'กรุณายืนยันการชำระเงินให้เรียบร้อยก่อน', 'warning');
+        return;
       }
     }
   
+    // อัปเดตสถานะได้
     this.tableStatusService.updateTableStatus(table).subscribe(
       (res: any) => {
-        Swal.fire('สำเร็จ', `โต๊ะ ${table.table_id} อัพเดทแล้ว!`, 'success');
+        Swal.fire('สำเร็จ', `โต๊ะ ${table.table_id} ถูกอัปเดตแล้ว`, 'success');
+  
         this.tableStatusService.getAllTable().subscribe((res) => {
           this.tables = res;
   
@@ -130,7 +133,7 @@ export class TableStatusComponent implements OnInit {
         });
       },
       (err) => {
-        Swal.fire('ล้มเหลว', 'ไม่สามารถอัพเดทสถานะโต๊ะได้', 'error');
+        Swal.fire('ล้มเหลว', 'ไม่สามารถอัปเดตสถานะโต๊ะได้', 'error');
         console.error(err);
       }
     );
@@ -161,6 +164,7 @@ export class TableStatusComponent implements OnInit {
   }  
   
   async selectPaymentMethod(table: any) {
+    await this.fetchOrderAndPayment();
     // หา payment_id ที่ตรงกับโต๊ะที่เลือก
     const order = this.order.find((o: any) => o.table_id === table.table_id);
     
