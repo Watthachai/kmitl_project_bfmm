@@ -415,12 +415,16 @@ def get_menu_id(food_name):
 
 def get_order_id(table_id):
     print(f"Getting order ID for table: {table_id}")
-    order_query = db.session.query(Order).filter_by(table_id=table_id).first()
+    # ดึงออเดอร์ที่มี table_id ล่าสุด (อ้างอิงจากลำดับการสร้างหรือวันที่)
+    order_query = db.session.query(Order).filter_by(table_id=table_id).order_by(Order.id.desc()).first()
+    
     if not order_query:
         print(f"No order found for table: {table_id}")
         return None
+    
     print(f"Order ID for table {table_id}: {order_query.order_id}")
     return order_query.order_id
+
 
 
 def process_status_change(command_type, food, table_id, order_id):
