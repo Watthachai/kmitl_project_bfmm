@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 06, 2025 at 11:19 AM
--- Server version: 8.0.39
--- PHP Version: 8.0.30
+-- Generation Time: Mar 25, 2025 at 01:01 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,12 +28,12 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `account` (
-  `id` int NOT NULL,
-  `username` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `mail` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `phone` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `role` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `mail` varchar(255) DEFAULT NULL,
+  `phone` varchar(255) DEFAULT NULL,
+  `role` varchar(255) DEFAULT NULL,
   `create` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -61,22 +61,12 @@ INSERT INTO `account` (`id`, `username`, `password`, `mail`, `phone`, `role`, `c
 --
 
 CREATE TABLE `history` (
-  `id` int NOT NULL,
-  `menu_id` int NOT NULL,
-  `quantity` int NOT NULL,
-  `total` int NOT NULL,
+  `id` int(11) NOT NULL,
+  `menu_id` int(11) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `total` int(11) NOT NULL,
   `time_stamp` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `history`
---
-
-INSERT INTO `history` (`id`, `menu_id`, `quantity`, `total`, `time_stamp`) VALUES
-(1, 1, 1, 65, '2025-01-01 12:30:00'),
-(2, 2, 1, 55, '2025-01-01 12:30:00'),
-(3, 3, 1, 55, '2025-01-01 12:30:00'),
-(4, 1, 2, 130, '2025-02-05 13:44:48');
 
 -- --------------------------------------------------------
 
@@ -85,10 +75,10 @@ INSERT INTO `history` (`id`, `menu_id`, `quantity`, `total`, `time_stamp`) VALUE
 --
 
 CREATE TABLE `ingredientpack` (
-  `id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `stock` int NOT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `stock` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -96,11 +86,13 @@ CREATE TABLE `ingredientpack` (
 --
 
 INSERT INTO `ingredientpack` (`id`, `name`, `description`, `stock`) VALUES
-(1, 'แพ็ก พิซซ่า', 'สำหรับทำพิซซ่า', 20),
-(2, 'แพ็ก สปาเกตตี้', 'สำหรับทำสปาเก็ตตี้', 20),
-(3, 'แพ็ก สเต๊ก', 'สำหรับทำสเต๊ก', 20),
-(4, 'แพ็ก สลัด', 'สำหรับทำสลัด', 20),
-(5, 'แพ็ก ข้าวผัด', 'สำหรับทำข้าวผัด', 20);
+(1, 'แพ็ก พิซซ่า', 'สำหรับทำพิซซ่า', 10),
+(2, 'แพ็ก สปาเกตตี้', 'สำหรับทำสปาเก็ตตี้', 17),
+(3, 'แพ็ก สเต๊ก', 'สำหรับทำสเต๊ก', 9),
+(4, 'แพ็ก สลัด', 'สำหรับทำสลัด', 19),
+(5, 'แพ็ก ข้าวผัด', 'สำหรับทำข้าวผัด', 14),
+(51, '1', '1', 10),
+(53, 'แพ็คทดลอง', 'ทดลอง', 10);
 
 -- --------------------------------------------------------
 
@@ -109,10 +101,10 @@ INSERT INTO `ingredientpack` (`id`, `name`, `description`, `stock`) VALUES
 --
 
 CREATE TABLE `ingredientpackitems` (
-  `id` int NOT NULL,
-  `ingredient_pack_id` int NOT NULL,
-  `ingredient_id` int NOT NULL,
-  `qty` int NOT NULL
+  `id` int(11) NOT NULL,
+  `ingredient_pack_id` int(11) NOT NULL,
+  `ingredient_id` int(11) NOT NULL,
+  `qty` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -137,7 +129,10 @@ INSERT INTO `ingredientpackitems` (`id`, `ingredient_pack_id`, `ingredient_id`, 
 (55, 5, 41, 2),
 (56, 5, 42, 200),
 (57, 5, 44, 10),
-(58, 5, 47, 20);
+(58, 5, 47, 20),
+(86, 51, 15, 100),
+(87, 51, 17, 100),
+(91, 53, 6, 50);
 
 -- --------------------------------------------------------
 
@@ -146,14 +141,14 @@ INSERT INTO `ingredientpackitems` (`id`, `ingredient_pack_id`, `ingredient_id`, 
 --
 
 CREATE TABLE `ingredients` (
-  `Ingredients_id` int NOT NULL,
-  `Ingredients_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `Ingredients_image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `Ingredients_des` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `main_stock` int DEFAULT NULL,
-  `sub_stock` int DEFAULT NULL,
-  `unit` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `enable` int NOT NULL DEFAULT '1'
+  `Ingredients_id` int(11) NOT NULL,
+  `Ingredients_name` varchar(255) NOT NULL,
+  `Ingredients_image` varchar(255) DEFAULT NULL,
+  `Ingredients_des` varchar(255) DEFAULT NULL,
+  `main_stock` int(11) DEFAULT NULL,
+  `sub_stock` int(11) DEFAULT NULL,
+  `unit` varchar(255) DEFAULT NULL,
+  `enable` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -161,22 +156,22 @@ CREATE TABLE `ingredients` (
 --
 
 INSERT INTO `ingredients` (`Ingredients_id`, `Ingredients_name`, `Ingredients_image`, `Ingredients_des`, `main_stock`, `sub_stock`, `unit`, `enable`) VALUES
-(1, 'น้ำพีช', 'peach_juice.jpg', 'น้ำพีช: น้ำผลไม้สดรสหวานจากผลพีช', 1000, 1000, 'ml', 1),
-(2, 'เอสเปรสโซ่', 'espresso.jpg', 'เอสเปรสโซ่: กาแฟดำเข้มข้นในปริมาณช็อต', 1000, 1000, 'shot', 1),
+(1, 'น้ำพีช', 'peach_juice.jpg', 'น้ำพีช: น้ำผลไม้สดรสหวานจากผลพีช', 550, 900, 'ml', 1),
+(2, 'เอสเปรสโซ่', 'espresso.jpg', 'เอสเปรสโซ่: กาแฟดำเข้มข้นในปริมาณช็อต', 980, 1000, 'shot', 1),
 (3, 'น้ำส้ม', 'orange_juice.jpg', 'น้ำส้ม: น้ำผลไม้สดรสเปรี้ยวหวานจากส้ม', 1000, 1000, 'ml', 1),
-(4, 'น้ำเสาวรส', 'passionfruit_juice.jpg', 'น้ำเสาวรส: น้ำผลไม้รสหวานอมเปรี้ยวจากเสาวรส', 1000, 1000, 'ml', 1),
-(5, 'น้ำลิ้นจี่', 'lychee_juice.jpg', 'น้ำลิ้นจี่: น้ำผลไม้หวานหอมจากลิ้นจี่', 1000, 1000, 'ml', 1),
-(6, 'นมสด', 'fresh_milk.jpg', 'นมสด: นมวัวสดรสชาติกลมกล่อม', 1000, 1000, 'ml', 1),
-(7, 'น้ำอัญชัน', 'butterfly_pea_juice.jpg', 'น้ำอัญชัน: น้ำสมุนไพรสีฟ้าจากดอกอัญชัน', 1000, 1000, 'ml', 1),
+(4, 'น้ำเสาวรส', 'passionfruit_juice.jpg', 'น้ำเสาวรส: น้ำผลไม้รสหวานอมเปรี้ยวจากเสาวรส', 950, 1000, 'ml', 1),
+(5, 'น้ำลิ้นจี่', 'lychee_juice.jpg', 'น้ำลิ้นจี่: น้ำผลไม้หวานหอมจากลิ้นจี่', 850, 1000, 'ml', 1),
+(6, 'นมสด', 'fresh_milk.jpg', 'นมสด: นมวัวสดรสชาติกลมกล่อม', 800, 1000, 'ml', 1),
+(7, 'น้ำอัญชัน', 'butterfly_pea_juice.jpg', 'น้ำอัญชัน: น้ำสมุนไพรสีฟ้าจากดอกอัญชัน', 970, 1000, 'ml', 1),
 (8, 'มัจฉะเข้มข้น', 'matcha_concentrate.jpg', 'มัจฉะเข้มข้น: ผงชาเขียวมัจฉะที่มีรสขมเข้มข้น', 1000, 1000, 'ml', 1),
-(9, 'โซดา', 'soda.jpg', 'โซดา: น้ำอัดลมรสซ่าที่มีความเย็นสดชื่น', 1000, 1000, 'ml', 1),
+(9, 'โซดา', 'soda.jpg', 'โซดา: น้ำอัดลมรสซ่าที่มีความเย็นสดชื่น', 850, 1000, 'ml', 1),
 (10, 'น้ำสตอเบอร์รี่', 'strawberry_juice.jpg', 'น้ำสตอเบอร์รี่: น้ำผลไม้รสหวานจากสตอเบอร์รี่', 1000, 1000, 'ml', 1),
 (11, 'น้ำกีวี่', 'kiwi_juice.jpg', 'น้ำกีวี่: น้ำผลไม้จากกีวี่ที่มีรสเปรี้ยวหวาน', 1000, 1000, 'ml', 1),
 (12, 'บลูฮาวาย', 'blue_hawaii.jpg', 'บลูฮาวาย: เครื่องดื่มสีฟ้าที่มีรสหวานสดชื่น', 1000, 1000, 'ml', 1),
 (13, 'ชาดำ', 'black_tea.jpg', 'ชาดำ: ชาที่มีรสเข้มข้นและกลิ่นหอม', 1000, 1000, 'ml', 1),
 (14, 'น้ำมะนาว', 'lemon_juice.jpg', 'น้ำมะนาว: น้ำผลไม้สดรสเปรี้ยวจากมะนาว', 1000, 1000, 'ml', 1),
 (15, 'น้ำผึ้ง', 'honey.jpg', 'น้ำผึ้ง: น้ำหวานจากรังผึ้ง', 1000, 1000, 'ml', 1),
-(16, 'ชาเขียว', 'green_tea.jpg', 'ชาเขียว: ชาผลิตจากใบชาเขียวที่มีรสหอมและสดชื่น', 1000, 1000, 'ml', 1),
+(16, 'ชาเขียว', 'green_tea.jpg', 'ชาเขียว: ชาผลิตจากใบชาเขียวที่มีรสหอมและสดชื่น', 850, 1000, 'ml', 1),
 (17, 'น้ำแอปเปิ้ล', 'apple_juice.jpg', 'น้ำแอปเปิ้ล: น้ำผลไม้รสหวานจากแอปเปิ้ล', 1000, 1000, 'ml', 1),
 (18, 'ซอสคาราเมล', 'caramel_sauce.jpg', 'ซอสคาราเมล: ซอสหวานจากน้ำตาลคาราเมล', 1000, 1000, 'ml', 1),
 (19, 'โกโก้เข้มข้น', 'cocoa_concentrate.jpg', 'โกโก้เข้มข้น: ผงโกโก้ที่มีรสขมเข้ม', 1000, 1000, 'ml', 1),
@@ -201,43 +196,43 @@ INSERT INTO `ingredients` (`Ingredients_id`, `Ingredients_name`, `Ingredients_im
 (38, 'น้ำเปล่า', 'water.jpg', 'น้ำเปล่า: น้ำสะอาดที่ไม่ปรุงแต่งรสชาติ', 1000, 1000, 'ml', 1),
 (39, 'น้ำอัดลม', 'carbonated_drink.jpg', 'น้ำอัดลม: เครื่องดื่มที่มีฟองซ่าจากคาร์บอนไดออกไซด์', 1000, 1000, 'ml', 1),
 (40, 'น้ำอัดลมใส', 'clear_carbonated_drink.jpg', 'น้ำอัดลมใส: น้ำอัดลมใสที่มีรสซ่าหอมหวาน', 1000, 1000, 'ml', 1),
-(41, 'ไข่', 'egg.jpg', 'ไข่ไก่สด', 10000, 10000, 'unit', 1),
-(42, 'ข้าว', 'rice.jpg', 'ข้าวหอมมะลิ', 10000, 10000, 'gram', 1),
-(43, 'กุ้ง', 'shrimp.jpg', 'กุ้งสด', 10000, 10000, 'gram', 1),
-(44, 'กระเทียม', 'garlic.jpg', 'กระเทียมสด', 10000, 10000, 'gram', 1),
+(41, 'ไข่', 'egg.jpg', 'ไข่ไก่สด', 9992, 10000, 'unit', 1),
+(42, 'ข้าว', 'rice.jpg', 'ข้าวหอมมะลิ', 9200, 10000, 'gram', 1),
+(43, 'กุ้ง', 'shrimp.jpg', 'กุ้งสด', 8950, 10000, 'gram', 1),
+(44, 'กระเทียม', 'garlic.jpg', 'กระเทียมสด', 9960, 10000, 'gram', 1),
 (45, 'หอมแดง', 'shallot.jpg', 'หอมแดงสด', 10000, 10000, 'gram', 1),
-(46, 'น้ำมันพืช', 'vegetable_oil.jpg', 'น้ำมันพืชสำหรับทำอาหาร', 10000, 10000, 'gram', 1),
-(47, 'ซอสหอยนางรม', 'oyster_sauce.jpg', 'ซอสหอยนางรม', 10000, 10000, 'gram', 1),
-(48, 'เห็ด', 'mushroom.jpg', 'เห็ดสด', 10000, 10000, 'gram', 1),
+(46, 'น้ำมันพืช', 'vegetable_oil.jpg', 'น้ำมันพืชสำหรับทำอาหาร', 9940, 10000, 'gram', 1),
+(47, 'ซอสหอยนางรม', 'oyster_sauce.jpg', 'ซอสหอยนางรม', 9920, 10000, 'gram', 1),
+(48, 'เห็ด', 'mushroom.jpg', 'เห็ดสด', 9100, 10000, 'gram', 1),
 (49, 'น้ำซุป', 'broth.jpg', 'น้ำซุปใส', 10000, 10000, 'gram', 1),
-(50, 'หมู', 'pork.jpg', 'หมูสด', 10000, 10000, 'gram', 1),
-(51, 'ไก่', 'chicken.jpg', 'ไก่สด', 10000, 10000, 'gram', 1),
-(52, 'ซอสพริก', 'chili_sauce.jpg', 'ซอสพริกเผ็ด', 10000, 10000, 'gram', 1),
+(50, 'หมู', 'pork.jpg', 'หมูสด', 9700, 10000, 'gram', 1),
+(51, 'ไก่', 'chicken.jpg', 'ไก่สด', 9000, 10000, 'gram', 1),
+(52, 'ซอสพริก', 'chili_sauce.jpg', 'ซอสพริกเผ็ด', 9930, 10000, 'gram', 1),
 (53, 'บะหมี่หยก', 'noodles.jpg', 'บะหมี่หยก', 10000, 10000, 'gram', 1),
-(54, 'ผัก', 'vegetables.jpg', 'ผักสด', 10000, 10000, 'gram', 1),
+(54, 'ผัก', 'vegetables.jpg', 'ผักสด', 9950, 10000, 'gram', 1),
 (55, 'แซลม่อน', 'salmon.jpg', 'แซลม่อนสด', 10000, 10000, 'gram', 1),
 (56, 'ซอสเทริยากิ', 'teriyaki_sauce.jpg', 'ซอสเทริยากิ', 10000, 10000, 'gram', 1),
 (57, 'ซอสเขียวหวาน', 'green_curry_sauce.jpg', 'ซอสเขียวหวาน', 10000, 10000, 'gram', 1),
-(58, 'แป้งพิซซ่า', 'pizza_dough.jpg', 'แป้งพิซซ่า', 10000, 10000, 'gram', 1),
-(59, 'ซอสมะเขือเทศ', 'tomato_sauce.jpg', 'ซอสมะเขือเทศ', 10000, 10000, 'gram', 1),
-(60, 'ชีส', 'cheese.jpg', 'ชีสสด', 10000, 10000, 'gram', 1),
-(61, 'แฮม', 'ham.jpg', 'แฮม', 10000, 10000, 'gram', 1),
-(62, 'สับปะรด', 'pineapple.jpg', 'สับปะรดสด', 10000, 10000, 'gram', 1),
+(58, 'แป้งพิซซ่า', 'pizza_dough.jpg', 'แป้งพิซซ่า', 9999, 10000, 'gram', 1),
+(59, 'ซอสมะเขือเทศ', 'tomato_sauce.jpg', 'ซอสมะเขือเทศ', 9900, 10000, 'gram', 1),
+(60, 'ชีส', 'cheese.jpg', 'ชีสสด', 9850, 10000, 'gram', 1),
+(61, 'แฮม', 'ham.jpg', 'แฮม', 9100, 10000, 'gram', 1),
+(62, 'สับปะรด', 'pineapple.jpg', 'สับปะรดสด', 9900, 10000, 'gram', 1),
 (63, 'ทูน่า', 'tuna.jpg', 'ทูน่าสด', 10000, 10000, 'gram', 1),
 (64, 'ผักโขม', 'spinach.jpg', 'ผักโขมสด', 10000, 10000, 'gram', 1),
 (65, 'ปลาหมึก', 'squid.jpg', 'ปลาหมึกสด', 10000, 10000, 'gram', 1),
 (66, 'สปาเก็ตตี้', 'spaghetti.jpg', 'สปาเก็ตตี้', 10000, 10000, 'gram', 1),
-(67, 'เบคอน', 'bacon.jpg', 'เบคอน', 10000, 10000, 'gram', 1),
-(68, 'ครีม', 'cream.jpg', 'ครีมสด', 10000, 10000, 'gram', 1),
-(69, 'ทะเล', 'seafood.jpg', 'อาหารทะเลสด', 10000, 10000, 'gram', 1),
-(70, 'พริกขี้หนู', 'bird_chili.jpg', 'พริกขี้หนูสด', 10000, 10000, 'gram', 1),
+(67, 'เบคอน', 'bacon.jpg', 'เบคอน', 9900, 10000, 'gram', 1),
+(68, 'ครีม', 'cream.jpg', 'ครีมสด', 9950, 10000, 'gram', 1),
+(69, 'ทะเล', 'seafood.jpg', 'อาหารทะเลสด', 9800, 10000, 'gram', 1),
+(70, 'พริกขี้หนู', 'bird_chili.jpg', 'พริกขี้หนูสด', 9900, 10000, 'gram', 1),
 (71, 'ไข่กุ้ง', 'roe_egg.jpg', 'ไข่กุ้งสด', 10000, 10000, 'unit', 1),
 (72, 'ซอสโชยุ', 'soy_sauce.jpg', 'ซอสโชยุ', 10000, 10000, 'gram', 1),
 (73, 'พริกแห้ง', 'dried_chili.jpg', 'พริกแห้ง', 10000, 10000, 'gram', 1),
 (74, 'น้ำส้ม', 'orange_juice.jpg', 'น้ำส้มคั้นสด', 10000, 10000, 'gram', 1),
-(75, 'เนื้อหมู', 'pork_meat.jpg', 'เนื้อหมูสด', 10000, 10000, 'gram', 1),
+(75, 'เนื้อหมู', 'pork_meat.jpg', 'เนื้อหมูสด', 8800, 10000, 'gram', 1),
 (76, 'มันฝรั่ง', 'potato.jpg', 'มันฝรั่งสด', 10000, 10000, 'gram', 1),
-(77, 'เนื้อโคขุน', 'beef_cow.jpg', 'เนื้อโคขุน', 10000, 10000, 'gram', 1),
+(77, 'เนื้อโคขุน', 'beef_cow.jpg', 'เนื้อโคขุน', 9800, 10000, 'gram', 1),
 (78, 'ซอส', 'sauce.jpg', 'ซอสปรุงรส', 10000, 10000, 'gram', 1),
 (79, 'น้ำสลัด', 'salad_dressing.jpg', 'น้ำสลัด', 10000, 10000, 'gram', 1),
 (80, 'ปูอัด', 'crab_stick.jpg', 'ปูอัด', 10000, 10000, 'gram', 1),
@@ -249,11 +244,13 @@ INSERT INTO `ingredients` (`Ingredients_id`, `Ingredients_name`, `Ingredients_im
 (86, 'ขนมจีบ', 'dumplings.jpg', 'ขนมจีบ', 10000, 10000, 'gram', 1),
 (87, 'วาฟเฟิล', 'waffle.jpg', 'วาฟเฟิล', 10000, 10000, 'gram', 1),
 (88, 'ไอศกรีม', 'ice_cream.jpg', 'ไอศกรีม', 10000, 10000, 'gram', 1),
-(89, 'กล้วยหอม', 'banana.jpg', 'กล้วยหอม', 10000, 10000, 'gram', 1),
+(89, 'กล้วยหอม', 'banana.jpg', 'กล้วยหอม', 49, 300, 'unit', 1),
 (90, 'แป้งทอด', 'batter_flour.jpg', 'แป้งทอดกรอบ', 10000, 10000, 'gram', 1),
-(91, 'แป้ง', 'flour.jpg', 'แป้งสาลี', 10000, 10000, 'gram', 1),
-(92, 'น้ำตาล', 'sugar.jpg', 'น้ำตาลทราย', 10000, 10000, 'gram', 1),
-(93, 'น้ำผึ้ง', 'honey.jpg', 'น้ำผึ้งแท้', 10000, 10000, 'gram', 1);
+(91, 'แป้ง', 'flour.jpg', 'แป้งสาลี', 9600, 10000, 'gram', 1),
+(92, 'น้ำตาล', 'sugar.jpg', 'น้ำตาลทราย', 9940, 10000, 'gram', 1),
+(93, 'น้ำผึ้ง', 'honey.jpg', 'น้ำผึ้งแท้', 9960, 10000, 'gram', 1),
+(159, 'test1', 'banana.jpg', 'test1', 150, 50, 'unit', 1),
+(160, 'testpic', 'Screenshot_2024-05-27_094911.png', 'asdfsafs', 100, 1000, 'ml', 1);
 
 -- --------------------------------------------------------
 
@@ -262,15 +259,15 @@ INSERT INTO `ingredients` (`Ingredients_id`, `Ingredients_name`, `Ingredients_im
 --
 
 CREATE TABLE `menu` (
-  `id` int NOT NULL,
-  `type_id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `image` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `des` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `price` int DEFAULT NULL,
-  `tag` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `Warning` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `enable` int NOT NULL DEFAULT '1'
+  `id` int(11) NOT NULL,
+  `type_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `image` varchar(255) DEFAULT NULL,
+  `des` varchar(255) DEFAULT NULL,
+  `price` int(11) DEFAULT NULL,
+  `tag` varchar(255) DEFAULT NULL,
+  `Warning` varchar(255) DEFAULT NULL,
+  `enable` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -372,10 +369,19 @@ INSERT INTO `menu` (`id`, `type_id`, `name`, `image`, `des`, `price`, `tag`, `Wa
 (92, 8, 'เฟรนฟราย+ซอสทรัฟเฟิล', 'french_fries_truffle_sauce.png', 'เฟรนฟรายราดซอสทรัฟเฟิลหอมละมุน', 30, '', '', 1),
 (93, 8, 'เฟรนฟราย+ซีสซี่ดิป', 'french_fries_cheese_dip.png', 'เฟรนฟรายกรอบ เสิร์ฟพร้อมชีสดิปเข้มข้น', 25, '', '', 1),
 (94, 8, 'มิกซ์ฟราย', 'mix_fries.png', 'รวมของทอดกรอบหลายชนิดในจานเดียว', 20, '', '', 1),
-(95, 8, 'กุ้งตะเกียบ', ' shrimp_kabayaki.png', 'กุ้งชุบแป้งทอด เสิร์ฟพร้อมซอส', 30, '', 'มีกุ้งเป็นส่วนผสม ผู้แพ้มันกุ้งโปรดระมัดระวัง', 1),
+(95, 8, 'กุ้งตะเกียบ', 'shrimp_kabayaki.png', 'กุ้งชุบแป้งทอด เสิร์ฟพร้อมซอส', 30, '', 'มีกุ้งเป็นส่วนผสม ผู้แพ้มันกุ้งโปรดระมัดระวัง', 1),
 (96, 8, 'ขนมจีบไข่กุ้ง', 'roe_dim_sum.png', 'ขนมจีบเนื้อแน่น โรยไข่กุ้งเพิ่มความอร่อย', 30, '', 'มีกุ้งเป็นส่วนผสม ผู้แพ้มันกุ้งโปรดระมัดระวัง', 1),
 (97, 8, 'วาฟเฟิลไอศกรีม', 'waffle_ice_cream.png', 'วาฟเฟิลกรอบนอกนุ่มใน เสิร์ฟพร้อมไอศกรีม', 30, '', '', 1),
-(98, 8, 'กล้วยหอมทอด', 'fried_banana.png', 'กล้วยหอมทอดกรอบ หวานหอมลงตัว', 20, '', '', 1);
+(98, 8, 'กล้วยหอมทอด', 'fried_banana.png', 'กล้วยหอมทอดกรอบ หวานหอมลงตัว', 20, '', '', 1),
+(139, 5, 'test1', 'cheese_ball.png', 'asdf', 100, '', '', 1),
+(140, 5, 'test2', 'americano.png', 'adfsaf', 100, '', '', 1),
+(141, 5, 'test3', 'cocoa_banana.png', 'asdfaf', 100, '', '', 1),
+(149, 5, 'test4', 'green_noodle_grilled_chicken.png', 'asdfdsa', 100, '', '', 1),
+(150, 5, 'test5', 'korean_banana_milk.png', 'asdfsaf', 100, '', '', 1),
+(151, 5, 'testPicture', 'mile.jpg', 'testPicture', 1000000, '', '', 1),
+(153, 5, 'asdfdsa', 'S__23928835.jpg', 'sdfsadf', 100, '', '', 1),
+(154, 5, 'sadfrfwert', '55678.jpg', 'asdfsafasdwer', 100, '', '', 1),
+(156, 5, 'fghjgvnfg', 'Screenshot_2024-05-31_215617.png', 'dgfhdfgbn', 100, '', '', 1);
 
 -- --------------------------------------------------------
 
@@ -384,10 +390,10 @@ INSERT INTO `menu` (`id`, `type_id`, `name`, `image`, `des`, `price`, `tag`, `Wa
 --
 
 CREATE TABLE `menuingredientpack` (
-  `id` int NOT NULL,
-  `menu_id` int NOT NULL,
-  `ingredient_pack_id` int NOT NULL,
-  `qty` int NOT NULL
+  `id` int(11) NOT NULL,
+  `menu_id` int(11) NOT NULL,
+  `ingredient_pack_id` int(11) NOT NULL,
+  `qty` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -425,7 +431,13 @@ INSERT INTO `menuingredientpack` (`id`, `menu_id`, `ingredient_pack_id`, `qty`) 
 (28, 82, 4, 1),
 (29, 83, 5, 1),
 (30, 84, 5, 1),
-(31, 85, 5, 1);
+(31, 85, 5, 1),
+(48, 139, 3, 1),
+(49, 140, 3, 1),
+(54, 149, 3, 1),
+(55, 150, 3, 1),
+(56, 151, 53, 1),
+(58, 153, 53, 1);
 
 -- --------------------------------------------------------
 
@@ -434,11 +446,11 @@ INSERT INTO `menuingredientpack` (`id`, `menu_id`, `ingredient_pack_id`, `qty`) 
 --
 
 CREATE TABLE `menuingredients` (
-  `MenuIngredients_id` int NOT NULL,
-  `menu_id` int NOT NULL,
-  `ingredient_id` int NOT NULL,
-  `volume` int DEFAULT NULL,
-  `unit` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `MenuIngredients_id` int(11) NOT NULL,
+  `menu_id` int(11) NOT NULL,
+  `ingredient_id` int(11) NOT NULL,
+  `volume` int(11) DEFAULT NULL,
+  `unit` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -621,7 +633,18 @@ INSERT INTO `menuingredients` (`MenuIngredients_id`, `menu_id`, `ingredient_id`,
 (173, 98, 91, 200, 'gram'),
 (174, 98, 92, 30, 'gram'),
 (175, 98, 46, 30, 'gram'),
-(176, 98, 93, 20, 'gram');
+(176, 98, 93, 20, 'gram'),
+(177, 98, 89, 1, 'unit'),
+(178, 139, 1, 100, 'ml'),
+(179, 139, 11, 100, 'ml'),
+(180, 140, 3, 100, 'ml'),
+(181, 140, 6, 100, 'ml'),
+(182, 140, 13, 100, 'ml'),
+(183, 141, 1, 100, 'ml'),
+(184, 141, 9, 100, 'ml'),
+(185, 141, 13, 100, 'ml'),
+(192, 149, 2, 10, 'ml'),
+(193, 151, 14, 100, 'ml');
 
 -- --------------------------------------------------------
 
@@ -630,9 +653,9 @@ INSERT INTO `menuingredients` (`MenuIngredients_id`, `menu_id`, `ingredient_id`,
 --
 
 CREATE TABLE `menutype` (
-  `id` int NOT NULL,
-  `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `des` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `des` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -656,21 +679,12 @@ INSERT INTO `menutype` (`id`, `name`, `des`) VALUES
 --
 
 CREATE TABLE `order` (
-  `order_id` int NOT NULL,
-  `payment_id` int DEFAULT NULL,
-  `number_table` int NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `payment_id` int(11) DEFAULT NULL,
+  `table_id` int(11) NOT NULL,
   `create_order` datetime DEFAULT NULL,
-  `number_of_people` int DEFAULT NULL
+  `number_of_people` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `order`
---
-
-INSERT INTO `order` (`order_id`, `payment_id`, `number_table`, `create_order`, `number_of_people`) VALUES
-(1, 1, 8, '2025-01-01 12:30:00', 2),
-(2, 2, 4, '2025-01-01 13:00:00', 1),
-(31, 52, 1, '2025-02-05 19:40:42', 2);
 
 -- --------------------------------------------------------
 
@@ -679,31 +693,17 @@ INSERT INTO `order` (`order_id`, `payment_id`, `number_table`, `create_order`, `
 --
 
 CREATE TABLE `orderitem` (
-  `order_item_id` int NOT NULL,
-  `menu_id` int NOT NULL,
-  `menu_qty` int NOT NULL,
-  `menu_note` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `round_order` int DEFAULT NULL,
+  `order_item_id` int(11) NOT NULL,
+  `menu_id` int(11) NOT NULL,
+  `menu_qty` int(11) NOT NULL,
+  `menu_note` varchar(255) DEFAULT NULL,
+  `round_order` int(11) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
-  `order_id` int DEFAULT NULL,
-  `status_order` int DEFAULT NULL,
-  `status_serve` int DEFAULT NULL,
+  `order_id` int(11) DEFAULT NULL,
+  `status_order` int(11) DEFAULT NULL,
+  `status_serve` int(11) DEFAULT NULL,
   `finish_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `orderitem`
---
-
-INSERT INTO `orderitem` (`order_item_id`, `menu_id`, `menu_qty`, `menu_note`, `round_order`, `create_date`, `order_id`, `status_order`, `status_serve`, `finish_date`) VALUES
-(1, 1, 2, '', 1, '2025-01-01 12:30:00', 1, 2, 1, '2025-01-01 13:00:00'),
-(2, 75, 1, '', 1, '2025-01-01 12:30:00', 1, 2, 1, '2025-01-01 13:00:00'),
-(3, 76, 1, 'ไม่ใส่ผักเคียง', 1, '2025-01-01 12:30:00', 1, 2, 1, '2025-01-01 13:00:00'),
-(4, 2, 1, '', 2, '2025-01-01 13:00:00', 1, 2, 1, '2025-01-01 13:05:00'),
-(5, 1, 1, '', 1, '2025-01-01 13:00:00', 2, 2, 1, '2025-01-01 13:30:00'),
-(6, 75, 1, '', 1, '2025-01-01 13:00:00', 2, 2, 1, '2025-01-01 13:30:00'),
-(7, 2, 1, '', 2, '2025-01-01 13:30:00', 2, 1, 0, NULL),
-(74, 1, 2, 'ไม่มีข้าว', 1, '2025-02-05 12:40:42', 31, 2, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -712,21 +712,12 @@ INSERT INTO `orderitem` (`order_item_id`, `menu_id`, `menu_qty`, `menu_note`, `r
 --
 
 CREATE TABLE `payment` (
-  `payment_id` int NOT NULL,
-  `total_price` int NOT NULL,
-  `payment_method` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `payment_status` int DEFAULT NULL,
+  `payment_id` int(11) NOT NULL,
+  `total_price` int(11) NOT NULL,
+  `payment_method` varchar(255) DEFAULT NULL,
+  `payment_status` int(11) DEFAULT NULL,
   `payment_date` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `payment`
---
-
-INSERT INTO `payment` (`payment_id`, `total_price`, `payment_method`, `payment_status`, `payment_date`) VALUES
-(1, 500, 'PromptPay', 1, '2025-01-01 12:30:00'),
-(2, 500, 'PromptPay', 0, '2025-01-01 12:30:00'),
-(52, 4000, 'PromptPay', 1, '2025-02-05 20:44:48');
 
 -- --------------------------------------------------------
 
@@ -735,10 +726,10 @@ INSERT INTO `payment` (`payment_id`, `total_price`, `payment_method`, `payment_s
 --
 
 CREATE TABLE `step` (
-  `id` int NOT NULL,
-  `step` int NOT NULL,
-  `description` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `menu_id` int NOT NULL
+  `id` int(11) NOT NULL,
+  `step` int(11) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `menu_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -918,7 +909,7 @@ INSERT INTO `step` (`id`, `step`, `description`, `menu_id`) VALUES
 (170, 2, 'ขั้นที่ 2: ย่างจนสุก และเสิร์ฟพร้อมน้ำจิ้ม', 76),
 (171, 1, 'ขั้นที่ 1: เนื้อไก่ 200 กรัม : หมักด้วยพริกป่น 1 ช้อนชา และซอสพริก 1 ช้อนโต๊ะ', 77),
 (172, 2, 'ขั้นที่ 2: ย่างจนสุก และเสิร์ฟพร้อมสลัด', 77),
-(173, 1, 'ขั้นที่ 1: เนื้อริบอาย 250 กรัม : หมักด้วยเกลือและพริกไทย 10 นาที', 78),
+(173, 1, 'ลองยิง API update', 78),
 (174, 2, 'ขั้นที่ 2: ย่างจนสุกตามชอบ', 78),
 (175, 1, 'ขั้นที่ 1: เนื้อทีโบน 300 กรัม : หมักด้วยเกลือและพริกไทย 15 นาที', 79),
 (176, 2, 'ขั้นที่ 2: ย่างจนได้ระดับความสุกที่ต้องการ', 79),
@@ -963,7 +954,81 @@ INSERT INTO `step` (`id`, `step`, `description`, `menu_id`) VALUES
 (215, 1, 'ขั้นที่ 1: วาฟเฟิล 1 ชิ้น : ทอดหรืออบจนกรอบ', 97),
 (216, 2, 'ขั้นที่ 2: เสิร์ฟพร้อมไอศกรีมลูกโปรด', 97),
 (217, 1, 'ขั้นที่ 1: กล้วยหอม 1 ลูก : ชุบแป้งทอดกรอบ', 98),
-(218, 2, 'ขั้นที่ 2: ทอดในน้ำมันร้อนจนเหลืองทอง', 98);
+(218, 2, 'ขั้นที่ 2: ทอดในน้ำมันร้อนจนเหลืองทอง', 98),
+(228, 1, 'ขั้นที่ 1: เตรียมเนื้อ และ เครื่องเทศ', 115),
+(229, 2, 'ขั้นที่ 2: หมักเนื้อasdsad', 115),
+(230, 3, 'ขั้นที่ 3: ย่างเนื้อให้ได้ระดับความสุกที่ต้องการ', 115),
+(231, 4, 'ขั้นที่ 4: พักเนื้อ 15 นาทีแล้วพร้อมเสิร์ฟ', 115),
+(232, 1, 'ฟหกดกหฟด', 116),
+(233, 2, 'ฟหกดฟหกด', 116),
+(234, 3, 'ฟหกดหกฟ', 116),
+(235, 1, 'asdfsaf', 117),
+(236, 2, 'asdfsaf', 117),
+(237, 3, 'asdfsadf', 117),
+(238, 1, 'asdfsaf', 118),
+(239, 2, 'asdfsaf01101010', 118),
+(240, 3, 'asdfsadf', 118),
+(241, 1, 'asdfsaf', 119),
+(242, 2, 'asdfsadf', 119),
+(243, 3, 'asdfasdf', 119),
+(244, 1, 'asdfasdf', 120),
+(245, 2, 'asdfsadf', 120),
+(246, 3, 'asdfasdf', 120),
+(247, 1, 'ฟหกดหฟกด', 121),
+(248, 2, 'ฟหกดหกดหกฟดasdfasdf', 121),
+(249, 3, 'asdfasdfasdf', 121),
+(250, 1, 'aasdfasf', 122),
+(251, 2, 'asdfdsf', 122),
+(252, 1, 'dasasdf', 123),
+(253, 2, 'asdfadsf', 123),
+(254, 1, 'ฟหกดฟหด', 124),
+(255, 2, 'ฟหกดหฟด', 124),
+(256, 1, 'asdfsaf', 125),
+(257, 2, 'asdfdsaf', 125),
+(258, 1, 'gjhkghk', 126),
+(259, 2, 'ghjkghkjghk', 126),
+(260, 1, 'dgffdgh', 127),
+(261, 2, 'dfghdfghf', 127),
+(262, 1, 'adsfasdf', 128),
+(263, 2, 'asdfasdf', 128),
+(264, 1, 'asdfasdf', 129),
+(265, 2, 'asdfsadf', 129),
+(266, 1, 'asdfsaf', 130),
+(267, 2, 'asdfsaf', 130),
+(268, 1, 'asdfadsf', 131),
+(269, 2, 'asdfsaf', 131),
+(270, 1, 'asdfsdaf', 132),
+(271, 2, 'asdfasdf', 132),
+(272, 1, 'asdfasdf', 133),
+(273, 2, 'asdfsadf', 133),
+(274, 1, 'sdafsaf', 134),
+(275, 2, 'asdfdsaf', 134),
+(276, 1, 'sdafasdf', 135),
+(277, 2, 'sadfsdaf', 135),
+(278, 1, 'asdfsaf', 136),
+(279, 2, 'asdfdsaf', 136),
+(280, 1, 'asdfsaf', 137),
+(281, 2, 'adfasf', 137),
+(282, 1, 'dasfdasf', 138),
+(283, 2, 'asdfsaf', 138),
+(284, 1, 'asdfsaf', 139),
+(285, 2, 'asdfasf', 139),
+(286, 1, 'adsfsaf', 140),
+(287, 2, 'asdfasdf', 140),
+(288, 3, 'sdfasdf', 140),
+(289, 1, 'adsfsaf', 141),
+(290, 2, 'adsfadsf', 141),
+(294, 1, 'adsfasdf', 143),
+(295, 2, 'asdfasfsaf', 143),
+(306, 1, 'asdfdasf', 149),
+(307, 2, 'asdfasdf', 149),
+(308, 3, 'asdfsaf', 149),
+(309, 1, 'sdfdsaf', 150),
+(310, 2, 'asdfsfas', 150),
+(311, 1, 'asdfsadf', 151),
+(313, 1, 'asdfdasf', 153),
+(314, 1, 'sdafsaf', 154),
+(316, 1, 'fasdfdsaf', 156);
 
 -- --------------------------------------------------------
 
@@ -972,11 +1037,11 @@ INSERT INTO `step` (`id`, `step`, `description`, `menu_id`) VALUES
 --
 
 CREATE TABLE `table` (
-  `table_id` int NOT NULL,
-  `number_table` int NOT NULL,
-  `people` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `status` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `code` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `table_id` int(11) NOT NULL,
+  `number_table` int(11) NOT NULL,
+  `people` varchar(255) DEFAULT NULL,
+  `status` varchar(255) NOT NULL,
+  `code` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -984,26 +1049,26 @@ CREATE TABLE `table` (
 --
 
 INSERT INTO `table` (`table_id`, `number_table`, `people`, `status`, `code`) VALUES
-(1, 0, '2', 'enable', 'b$V5bdp'),
-(2, 1, '5', 'disable', 'x9X&b7'),
-(3, 0, '4', 'enable', 'qW2^p6'),
-(4, 0, '2', 'disable', 'i8G!tA'),
-(5, 0, '6', 'enable', 'n9@V#3'),
-(6, 0, '1', 'disable', 'kD4!fL'),
-(7, 0, '3', 'enable', 'p7bF*X'),
-(8, 0, '2', 'disable', 'u8Lx#4'),
-(9, 0, '5', 'enable', 'zF5!iY'),
-(10, 0, '4', 'disable', 'w3A^9H'),
-(11, 0, '6', 'enable', 'v5L$z1'),
-(12, 0, '2', 'disable', 'y6B*3Q'),
-(13, 0, '4', 'enable', 'oR9x!2'),
-(14, 0, '3', 'disable', 'bX8$F4'),
-(15, 0, '5', 'enable', 'j7N&d9'),
-(16, 0, '6', 'disable', 'm5F+Z3'),
-(17, 0, '1', 'enable', 'a8!F9b'),
-(18, 0, '2', 'disable', 'r7Z!x5'),
-(19, 0, '4', 'enable', 't9vK@6'),
-(20, 0, '3', 'disable', 'c2L#b8');
+(1, 0, '2', 'enable', 'dYzC9b7'),
+(2, 1, NULL, 'disable', NULL),
+(3, 0, NULL, 'disable', NULL),
+(4, 0, '2', 'enable', '6BNpD0Q'),
+(5, 0, NULL, 'disable', NULL),
+(6, 0, NULL, 'disable', NULL),
+(7, 0, NULL, 'disable', NULL),
+(8, 0, NULL, 'disable', NULL),
+(9, 0, NULL, 'disable', NULL),
+(10, 0, NULL, 'disable', NULL),
+(11, 0, NULL, 'disable', NULL),
+(12, 0, NULL, 'disable', NULL),
+(13, 0, NULL, 'disable', NULL),
+(14, 0, NULL, 'disable', NULL),
+(15, 0, NULL, 'disable', NULL),
+(16, 0, NULL, 'disable', NULL),
+(17, 0, NULL, 'disable', NULL),
+(18, 0, NULL, 'disable', NULL),
+(19, 0, NULL, 'disable', NULL),
+(20, 0, NULL, 'disable', NULL);
 
 -- --------------------------------------------------------
 
@@ -1012,24 +1077,15 @@ INSERT INTO `table` (`table_id`, `number_table`, `people`, `status`, `code`) VAL
 --
 
 CREATE TABLE `waste` (
-  `waste_id` int NOT NULL,
-  `item_name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `waste_id` int(11) NOT NULL,
+  `item_name` varchar(255) NOT NULL,
   `quantity` float NOT NULL,
-  `unit` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `price` int DEFAULT NULL,
+  `unit` varchar(255) DEFAULT NULL,
+  `price` int(11) DEFAULT NULL,
   `waste_date` datetime DEFAULT NULL,
-  `reason` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `note` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `reason` varchar(255) DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `waste`
---
-
-INSERT INTO `waste` (`waste_id`, `item_name`, `quantity`, `unit`, `price`, `waste_date`, `reason`, `note`) VALUES
-(1, '1', 1, 'กรัม', 65, '2025-01-01 12:30:00', 'รายการยกเลิก', ''),
-(2, '1', 1, 'กรัม', 55, '2025-01-01 12:30:00', 'ตกพื้น', ''),
-(3, '2', 1, 'ฟอง', 55, '2025-01-01 12:30:00', 'ตกพื้น', '');
 
 --
 -- Indexes for dumped tables
@@ -1095,7 +1151,8 @@ ALTER TABLE `menutype`
 -- Indexes for table `order`
 --
 ALTER TABLE `order`
-  ADD PRIMARY KEY (`order_id`);
+  ADD PRIMARY KEY (`order_id`),
+  ADD KEY `table_id` (`table_id`);
 
 --
 -- Indexes for table `orderitem`
@@ -1135,67 +1192,85 @@ ALTER TABLE `waste`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `ingredientpack`
 --
 ALTER TABLE `ingredientpack`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
 
 --
 -- AUTO_INCREMENT for table `ingredientpackitems`
 --
 ALTER TABLE `ingredientpackitems`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=92;
 
 --
 -- AUTO_INCREMENT for table `ingredients`
 --
 ALTER TABLE `ingredients`
-  MODIFY `Ingredients_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=158;
+  MODIFY `Ingredients_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=161;
+
+--
+-- AUTO_INCREMENT for table `menu`
+--
+ALTER TABLE `menu`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=157;
 
 --
 -- AUTO_INCREMENT for table `menuingredientpack`
 --
 ALTER TABLE `menuingredientpack`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=59;
 
 --
 -- AUTO_INCREMENT for table `menuingredients`
 --
 ALTER TABLE `menuingredients`
-  MODIFY `MenuIngredients_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
+  MODIFY `MenuIngredients_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=194;
 
 --
 -- AUTO_INCREMENT for table `order`
 --
 ALTER TABLE `order`
-  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=84;
 
 --
 -- AUTO_INCREMENT for table `orderitem`
 --
 ALTER TABLE `orderitem`
-  MODIFY `order_item_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=185;
 
 --
 -- AUTO_INCREMENT for table `payment`
 --
 ALTER TABLE `payment`
-  MODIFY `payment_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=87;
+
+--
+-- AUTO_INCREMENT for table `step`
+--
+ALTER TABLE `step`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=317;
 
 --
 -- AUTO_INCREMENT for table `table`
 --
 ALTER TABLE `table`
-  MODIFY `table_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `table_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
+-- AUTO_INCREMENT for table `waste`
+--
+ALTER TABLE `waste`
+  MODIFY `waste_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- Constraints for dumped tables
@@ -1207,6 +1282,12 @@ ALTER TABLE `table`
 ALTER TABLE `menuingredientpack`
   ADD CONSTRAINT `menuingredientpack_ibfk_1` FOREIGN KEY (`menu_id`) REFERENCES `menu` (`id`),
   ADD CONSTRAINT `menuingredientpack_ibfk_2` FOREIGN KEY (`ingredient_pack_id`) REFERENCES `ingredientpack` (`id`);
+
+--
+-- Constraints for table `order`
+--
+ALTER TABLE `order`
+  ADD CONSTRAINT `order_ibfk_1` FOREIGN KEY (`table_id`) REFERENCES `table` (`table_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

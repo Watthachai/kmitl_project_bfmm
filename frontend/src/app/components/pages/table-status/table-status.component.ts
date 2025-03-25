@@ -72,7 +72,7 @@ export class TableStatusComponent implements OnInit {
     });
   }
 
-  updateTable(table: any) {
+  async updateTable(table: any) {
     if (!table.people || Number(table.people) <= 0) {
       Swal.fire('ข้อผิดพลาด', 'กรุณาระบุจำนวนลูกค้าที่ถูกต้อง!', 'error');
       return;
@@ -82,30 +82,59 @@ export class TableStatusComponent implements OnInit {
       Swal.fire('ข้อผิดพลาด', 'กรุณาเลือกสถานะโต๊ะที่ถูกต้อง!', 'error');
       return;
     }
-      this.tableStatusService.updateTableStatus(table).subscribe(
-        (res : any) => {
-          Swal.fire('สำเร็จ', `โต๊ะ ${table.table_id} อัพเดทแล้ว!`, 'success');
-          this.tableStatusService.getAllTable().subscribe((res) => {
-            this.tables = res;
-            console.log(this.tables);
-            
-            this.tables.forEach((t: any) => {
-              if (t.code) {
-                // const qrData = `kmitlcafe.sirawit.in.th/ordering/1/${t.code}`;
-                const qrData = `https://kmitlcafe.sirawit.in.th:4200/ordering/1/${t.code}`;
-                t.url = qrData
-                t.image = this.sanitizer.bypassSecurityTrustUrl(
-                  `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=200x200`
-                ); 
-                console.log(qrData);
-              } else {
-                t.image = null
-              }
-            });
+  
+    const result = await Swal.fire({
+      title: 'คุณแน่ใจหรือไม่?',
+      text: `คุณต้องการเปลี่ยนสถานะโต๊ะเป็น "${table.status}" หรือไม่?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก'
+    });
+  
+    if (!result.isConfirmed) return;
+  
+    const relatedOrder = this.order.find((o: any) => o.table_id === table.table_id);
+  
+    if (table.status === 'disable' && relatedOrder) {
+      if (!relatedOrder.payment_id) {
+        Swal.fire('แจ้งเตือน', 'โต๊ะนี้มีการสั่งอาหาร แต่ยังไม่ได้ชำระเงิน', 'warning');
+        return;
+      }
+  
+      try {
+        await this.processPayment(relatedOrder.payment_id, 'PromptPay');
+      } catch (error) {
+        console.error('Payment process failed:', error);
+        return; // ถ้าชำระเงินไม่สำเร็จ หยุดที่นี่
+      }
+    }
+  
+    this.tableStatusService.updateTableStatus(table).subscribe(
+      (res: any) => {
+        Swal.fire('สำเร็จ', `โต๊ะ ${table.table_id} อัพเดทแล้ว!`, 'success');
+        this.tableStatusService.getAllTable().subscribe((res) => {
+          this.tables = res;
+  
+          this.tables.forEach((t: any) => {
+            if (t.code) {
+              const qrData = `https://kmitlcafe.sirawit.in.th:4200/ordering/1/${t.code}`;
+              t.url = qrData;
+              t.image = this.sanitizer.bypassSecurityTrustUrl(
+                `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=200x200`
+              );
+            } else {
+              t.image = null;
+            }
           });
-        }
-      )
-  }
+        });
+      },
+      (err) => {
+        Swal.fire('ล้มเหลว', 'ไม่สามารถอัพเดทสถานะโต๊ะได้', 'error');
+        console.error(err);
+      }
+    );
+  }  
   
   setSelectedTable(tableId: number) {
     localStorage.setItem('selectedTableId', tableId.toString());
