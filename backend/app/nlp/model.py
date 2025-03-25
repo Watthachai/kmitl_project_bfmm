@@ -400,27 +400,36 @@ def change_status_order(ai_data):
 
 
 def get_menu_id(food_name):
+    print(f"Getting menu ID for food: {food_name}")
     menu = db.session.execute(
         text("SELECT id FROM menu WHERE name = :food_name"),
         {"food_name": food_name}
     ).mappings().fetchone()
 
     if not menu:
+        print(f"No menu found for food: {food_name}")
         return None
+    print(f"Menu ID for food {food_name}: {menu['id']}")
     return menu['id']
 
 
 def get_order_id(table_id):
+    print(f"Getting order ID for table: {table_id}")
     order_query = db.session.query(Order).filter_by(table_id=table_id).first()
     if not order_query:
+        print(f"No order found for table: {table_id}")
         return None
+    print(f"Order ID for table {table_id}: {order_query.order_id}")
     return order_query.order_id
 
 
 def process_status_change(command_type, food, table_id, order_id):
+    print(f"Processing status change for command: {command_type}, food: {food}, table_id: {table_id}, order_id: {order_id}")
+
     # หา menu_id จาก food_name
     menu_id = get_menu_id(food)
     if not menu_id:
+        print(f"Failed to get menu ID for food: {food}")
         return 0
 
     # หา status_order เดิม
@@ -430,17 +439,27 @@ def process_status_change(command_type, food, table_id, order_id):
     ).mappings().fetchone()
 
     if not existing_status:
+        print(f"No existing status found for menu_id: {menu_id}, order_id: {order_id}")
         return 0
 
     current_status = existing_status["status_order"]
+    print(f"Existing status for menu_id {menu_id}, order_id {order_id}: {current_status}")
+
     status_mapping = {'COMMAND_1': 1, 'COMMAND_2': 2}
     new_status = status_mapping.get(command_type)
+    if not new_status:
+        print(f"Invalid command type: {command_type}")
+        return 0
+
+    print(f"New status for command {command_type}: {new_status}")
 
     # เช็กว่ามีการลดสถานะไหม (ไม่อนุญาต)
     if new_status <= current_status:
+        print(f"New status {new_status} is less than or equal to current status {current_status}, status change not allowed")
         return 0
 
     # อัปเดตสถานะ
+    print(f"Updating status_order to {new_status} for menu_id {menu_id}, order_id {order_id}")
     db.session.execute(
         text("UPDATE orderitem SET status_order = :status WHERE menu_id = :menu_id AND order_id = :order_id"),
         {"status": new_status, "menu_id": menu_id, "order_id": order_id}
@@ -449,6 +468,7 @@ def process_status_change(command_type, food, table_id, order_id):
 
     # ถ้า COMMAND_1 จะต้องตัดสต็อก
     if command_type == "COMMAND_1":
+        print("Command is COMMAND_1, checking stock")
         qty_result = db.session.execute(
             text("SELECT qty FROM orderitem WHERE menu_id = :menu_id AND order_id = :order_id"),
             {"menu_id": menu_id, "order_id": order_id}
@@ -456,11 +476,15 @@ def process_status_change(command_type, food, table_id, order_id):
 
         if qty_result:
             qty = qty_result["qty"]
+            print(f"Quantity for menu_id {menu_id}, order_id {order_id}: {qty}")
             stock_result = stock_manager(menu_id, qty)
             if stock_result["status"] != 200:
+                print(f"Failed to update stock for menu_id {menu_id}, qty {qty}")
                 return 0
+            print(f"Stock updated successfully for menu_id {menu_id}, qty {qty}")
 
     return 1
+
 
 
 # --- Main Audio Upload Endpoint ---
