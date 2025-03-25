@@ -474,7 +474,7 @@ def process_status_change(command_type, food, table_id, order_id):
     if command_type == "COMMAND_1":
         print("Command is COMMAND_1, checking stock")
         qty_result = db.session.execute(
-            text("SELECT qty FROM orderitem WHERE menu_id = :menu_id AND order_id = :order_id"),
+            text("SELECT menu_qty FROM orderitem WHERE menu_id = :menu_id AND order_id = :order_id"),
             {"menu_id": menu_id, "order_id": order_id}
         ).mappings().fetchone()
 
