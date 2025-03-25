@@ -108,7 +108,7 @@
                     </li>
                 </ul>
                 <h6 id="modalTotalPrice" class="fw-bold">รวมทั้งหมด: {{ getTotalPrice() }}฿</h6>
-                <h6 id="modalTotalPrice" class="fw-bold">โต๊ะที่: {{ user }}</h6>
+                <h6 id="modalTotalPrice" class="fw-bold">โต๊ะที่: {{ tableByCode }}</h6>
                 <button id="modalConfirmOrderButton" class="btn w-100 fw-bold"
                     style="background-color: #6F4E37; color: white;" (click)="confirmOrder()" data-bs-dismiss="modal">
                     ยืนยันคำสั่ง
