@@ -479,7 +479,7 @@ def process_status_change(command_type, food, table_id, order_id):
         ).mappings().fetchone()
 
         if qty_result:
-            qty = qty_result["qty"]
+            qty = qty_result["menu_qty"]
             print(f"Quantity for menu_id {menu_id}, order_id {order_id}: {qty}")
             stock_result = stock_manager(menu_id, qty)
             if stock_result["status"] != 200:
