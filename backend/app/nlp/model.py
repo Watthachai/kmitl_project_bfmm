@@ -457,6 +457,11 @@ def process_status_change(command_type, food, table_id, order_id):
 
     print(f"New status for command {command_type}: {new_status}")
 
+    # เช็กว่าไม่สามารถข้ามสถานะจาก 0 ไป 2 ได้ (ต้องเป็น 1 ก่อน)
+    if current_status == 0 and new_status == 2:
+        print(f"Cannot directly change status from 0 to 2. Status must be 1 first.")
+        return 0
+
     # เช็กว่ามีการลดสถานะไหม (ไม่อนุญาต)
     if new_status <= current_status:
         print(f"New status {new_status} is less than or equal to current status {current_status}, status change not allowed")
