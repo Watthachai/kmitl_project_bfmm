@@ -50,47 +50,40 @@ export class OrderingComponent implements OnInit{
   }
 
   ngOnInit(): void {
-    this.isLoadingMenus = true;
-    this.service_order.getAllMenuTypes().subscribe((res) => {
-      this.menu_types = res;
-      console.log(this.menu_types);
-    });
-
     this.isLoggedIn = !!this.tokenStorage.getToken();
     this.code = this.route.snapshot.paramMap.get('code');
-    console.log('QR Code:', this.code);
-
+    this.id = this.route.snapshot.paramMap.get('id');
+  
+    this.service_order.getAllMenuTypes().subscribe((res) => {
+      this.menu_types = res;
+    });
+  
     if (this.code) {
       this.verifyTableCode();
     }
-
-    this.tableService.getTableByCode(this.code).subscribe((res)=>{
-      this.table = res
-      this.tableByCode = res.table_id
-      this.tableCode = res.code
-
-      console.log("Table ID : ",this.tableByCode)
-      console.log("Table Code : ", this.tableCode);
-
+  
+    this.tableService.getTableByCode(this.code).subscribe((res) => {
+      this.table = res;
+      this.tableByCode = res.table_id;
+      this.tableCode = res.code;
+  
       if (this.tableByCode) {
         this.getTableOrders(this.tableByCode);
       }
-    })
-
+    });
+  
     this.loadCartFromLocalStorage();
-    this.id = this.route.snapshot.paramMap.get('id')
-    
-    this.service_order.getAllMenusById(this.id).subscribe((res)=>{
-      this.menu_by_type_id = res
-      console.log(this.menu_by_type_id);
-    })
-
-    this.service_order.getCategoryById(this.id).subscribe((res)=>{
-      this.category = res
-      console.log(this.category);
-    })
-    this.isLoadingMenus = false;
-
+  
+    this.isLoadingMenus = true;
+    this.service_order.getAllMenusById(this.id).subscribe((res) => {
+      this.menu_by_type_id = res;
+      this.isLoadingMenus = false;
+    });
+  
+    this.service_order.getCategoryById(this.id).subscribe((res) => {
+      this.category = res;
+    });
+  
     if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined') {
       this.ngZone.runOutsideAngular(() => {
         setInterval(() => {
@@ -99,8 +92,8 @@ export class OrderingComponent implements OnInit{
           });
         }, 5000);
       });
-    }  
-  }
+    }
+  }  
 
   verifyTableCode() {
     this.service_order.verifyTableCode(this.code).subscribe(
@@ -117,20 +110,15 @@ export class OrderingComponent implements OnInit{
   }
 
   selectMenuTypesById(id: any) {
-    this.isLoadingMenus = true;
-      if (this.tableByCode && this.tableCode) {
-        let url = `/ordering/${id}/${this.tableCode}`;
-        console.log('Navigating to:', url);
-    
-        this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-          this.router.navigate([url]);
-        });
-        this.isLoadingMenus = false;
-      } else {
-        Swal.fire('ข้อผิดพลาด', 'ไม่พบ QR Code ของโต๊ะ!', 'error');
-        this.isLoadingMenus = false;
-      }
-    }  
+    if (this.tableByCode && this.tableCode) {
+      let url = `/ordering/${id}/${this.tableCode}`;
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate([url]); // หน้านี้จะ reload ngOnInit()
+      });
+    } else {
+      Swal.fire('ข้อผิดพลาด', 'ไม่พบ QR Code ของโต๊ะ!', 'error');
+    }
+  }   
 
   sendMenuToCart(menu:any): void {
     this.menu_modalForm.controls['id'].setValue(menu.id);
