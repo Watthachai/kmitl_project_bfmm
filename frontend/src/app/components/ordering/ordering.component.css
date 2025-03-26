@@ -100,3 +100,35 @@
 .card {
     width: 350px;
 }
+
+.badge-preparing {
+    background-color: gray !important;
+    color: white;
+}
+
+.badge-cooking {
+    background-color: orange !important;
+    color: white;
+}
+
+.badge-ready {
+    background-color: #007bff !important; /* Bootstrap Blue */
+    color: white;
+}
+
+.badge-served {
+    background-color: green !important;
+    color: white;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}

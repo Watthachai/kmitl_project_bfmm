@@ -31,6 +31,9 @@ export class OrderingComponent implements OnInit{
   tableByCode: any;
   tableCode: any;
   tableOrders: any[] = [];
+  isLoadingMenus: boolean = false;
+
+
 
   constructor(private router: Router, private route: ActivatedRoute, private service_order: OrderingService, private cdr: ChangeDetectorRef, private tokenStorage: TokenStorageService,
     private tableService : TableStatusService, @Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone)
@@ -47,6 +50,7 @@ export class OrderingComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    this.isLoadingMenus = true;
     this.service_order.getAllMenuTypes().subscribe((res) => {
       this.menu_types = res;
       console.log(this.menu_types);
@@ -85,6 +89,7 @@ export class OrderingComponent implements OnInit{
       this.category = res
       console.log(this.category);
     })
+    this.isLoadingMenus = false;
 
     if (isPlatformBrowser(this.platformId) && typeof window !== 'undefined') {
       this.ngZone.runOutsideAngular(() => {
@@ -112,6 +117,7 @@ export class OrderingComponent implements OnInit{
   }
 
   selectMenuTypesById(id: any) {
+    this.isLoadingMenus = true;
       if (this.tableByCode && this.tableCode) {
         let url = `/ordering/${id}/${this.tableCode}`;
         console.log('Navigating to:', url);
@@ -119,8 +125,10 @@ export class OrderingComponent implements OnInit{
         this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
           this.router.navigate([url]);
         });
+        this.isLoadingMenus = false;
       } else {
         Swal.fire('ข้อผิดพลาด', 'ไม่พบ QR Code ของโต๊ะ!', 'error');
+        this.isLoadingMenus = false;
       }
     }  
 
@@ -142,29 +150,37 @@ export class OrderingComponent implements OnInit{
       name: this.menu_modalForm.value.name,
       price: this.menu_modalForm.value.price,
       qty: this.menu_modalForm.value.qty || 1,
-      note: (document.getElementById('menuNote') as HTMLTextAreaElement).value, // ดึงค่าจาก textarea
+      note: (document.getElementById('menuNote') as HTMLTextAreaElement).value,
     };
   
-    // ตรวจสอบว่ามีรายการในตะกร้าอยู่แล้วหรือไม่
-    const existingItem = this.cartItems.find(
-      (item) => item.id === cartItem.id && item.note === cartItem.note
-    );
-    if (existingItem) {
-      existingItem.qty += cartItem.qty; // เพิ่มจำนวนในรายการเดิม
-    } else {
-      this.cartItems.push(cartItem); // เพิ่มรายการใหม่
-    }
-    Swal.fire('เพิ่มเมนูในตะกร้าแล้ว', 'Add Menu Seccess!', 'success');
+    Swal.fire({
+      title: 'เพิ่มเมนูนี้ลงในตะกร้า?',
+      html: `<strong>${cartItem.name}</strong><br>ราคา: ${cartItem.price} บาท<br>จำนวน: ${cartItem.qty}<br>หมายเหตุ: ${cartItem.note || 'ไม่มี'}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, เพิ่มเลย',
+      cancelButtonText: 'ยกเลิก',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const existingItem = this.cartItems.find(
+          (item) => item.id === cartItem.id && item.note === cartItem.note
+        );
   
-    // บันทึกข้อมูลตะกร้าใน Local Storage
-    this.saveCartToLocalStorage();
+        if (existingItem) {
+          existingItem.qty += cartItem.qty;
+        } else {
+          this.cartItems.push(cartItem);
+        }
   
-    // แสดงข้อมูลใน Console
-    console.log('เพิ่มสินค้าในตะกร้า:', cartItem);
-    console.log('รายการทั้งหมดในตะกร้า:', this.cartItems);
-
-    this.cdr.detectChanges();
-  }  
+        this.saveCartToLocalStorage();
+        this.cdr.detectChanges();
+  
+        Swal.fire('เพิ่มเมนูเรียบร้อย', 'เมนูถูกเพิ่มในตะกร้าแล้ว!', 'success');
+        console.log('เพิ่มสินค้าในตะกร้า:', cartItem);
+        console.log('รายการทั้งหมดในตะกร้า:', this.cartItems);
+      }
+    });
+  }    
 
   increaseQty(index: number): void {
     const currentQty = this.menu_modalForm.value.qty || 1;
@@ -212,11 +228,24 @@ export class OrderingComponent implements OnInit{
   }  
 
   removeFromCart(index: number): void {
-    this.cartItems.splice(index, 1);
-    this.saveCartToLocalStorage();
-    console.log('ลบสินค้าออกจากตะกร้า:', index);
-    console.log(localStorage);
-  }
+    const item = this.cartItems[index];
+  
+    Swal.fire({
+      title: 'คุณต้องการลบเมนูนี้ออกจากตะกร้า?',
+      html: `<strong>${item.name}</strong><br>จำนวน: ${item.qty}<br>หมายเหตุ: ${item.note || 'ไม่มี'}`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'ใช่, ลบเลย',
+      cancelButtonText: 'ยกเลิก',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.cartItems.splice(index, 1);
+        this.saveCartToLocalStorage();
+        console.log('ลบสินค้าออกจากตะกร้า:', item);
+        Swal.fire('ลบเรียบร้อย', 'เมนูถูกนำออกจากตะกร้าแล้ว', 'success');
+      }
+    });
+  }  
 
   confirmOrder(): void {
     if (this.cartItems.length === 0) {
@@ -224,9 +253,8 @@ export class OrderingComponent implements OnInit{
       return;
     }
   
-    // ดึงข้อมูลจาก localStorage และ URL
     const tableId = this.tableByCode;
-    const code = this.code; // ดึง code จาก URL ที่ได้รับมา
+    const code = this.code;
   
     if (!tableId || !code) {
       Swal.fire('ข้อผิดพลาด', 'ไม่พบข้อมูลโต๊ะหรือ QR Code!', 'error');
@@ -237,33 +265,45 @@ export class OrderingComponent implements OnInit{
       return {
         id: item.id,
         qty: item.qty,
-        note: item.note?.trim() || 'ไม่มี' // ถ้าไม่มีหมายเหตุให้กำหนดเป็น 'ไม่มี'
+        note: item.note?.trim() || 'ไม่มี'
       };
     });
   
     const orderData = {
-      code: code,  // รหัส QR ที่ดึงมาจาก URL
-      people: "2", // จำนวนลูกค้า (สามารถเปลี่ยนได้หากมีข้อมูลจากฟอร์ม)
-      table: Number(this.tableByCode),
+      code: code,
+      people: "2",
+      table: Number(tableId),
       items: orderItems,
-      total_price: this.getTotalPrice(), // คำนวณราคารวม
+      total_price: this.getTotalPrice(),
     };
   
-    console.log('ข้อมูลการสั่งซื้อที่ส่งไป API:', JSON.stringify(orderData, null, 2));
+    // แสดง SweetAlert เพื่อยืนยันก่อนส่ง order
+    Swal.fire({
+      title: 'ยืนยันการสั่งอาหาร?',
+      html: `รวมทั้งหมด <strong>${orderData.total_price}</strong> บาท<br>จำนวน ${orderData.items.length} รายการ`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'ยืนยัน',
+      cancelButtonText: 'ยกเลิก',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        console.log('ข้อมูลการสั่งซื้อที่ส่งไป API:', JSON.stringify(orderData, null, 2));
   
-    this.service_order.createOrder(orderData).subscribe(
-      (response) => {
-        Swal.fire('ยืนยันคำสั่งเรียบร้อย', 'Your order has been placed successfully!', 'success');
-        this.cartItems = []; // ล้างตะกร้าหลังจากสั่งสำเร็จ
-        this.saveCartToLocalStorage(); // อัปเดต localStorage หลังล้างตะกร้า
-        this.getTableOrders(this.tableByCode);
-      },
-      (error) => {
-        console.error('Error placing order:', error);
-        Swal.fire('ข้อผิดพลาด', error.error.message || 'ไม่สามารถสั่งซื้อได้!', 'error');
+        this.service_order.createOrder(orderData).subscribe(
+          (response) => {
+            Swal.fire('ยืนยันคำสั่งเรียบร้อย', 'Your order has been placed successfully!', 'success');
+            this.cartItems = [];
+            this.saveCartToLocalStorage();
+            this.getTableOrders(tableId);
+          },
+          (error) => {
+            console.error('Error placing order:', error);
+            Swal.fire('ข้อผิดพลาด', error.error.message || 'ไม่สามารถสั่งซื้อได้!', 'error');
+          }
+        );
       }
-    );
-  }
+    });
+  }  
   
   getTableOrders(tableId: number) {
     this.service_order.getOrderItemsByTable(tableId).subscribe(

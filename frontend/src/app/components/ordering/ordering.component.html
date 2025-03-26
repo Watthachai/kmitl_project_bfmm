@@ -7,10 +7,12 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav" style="padding-left: 5%;">
-                <a class="nav-link" *ngFor="let category of menu_types" (click)="selectMenuTypesById(category.id)">{{category.name}}</a>
+                <a class="nav-link" *ngFor="let category of menu_types"
+                    (click)="selectMenuTypesById(category.id)">{{category.name}}</a>
             </div>
             <!-- <button class="btn btn-danger ms-auto me-3" *ngIf="isLoggedIn" (click)="logout()">Logout</button> -->
-            <button class="btn btn ms-auto me-3" style="color: white;" data-bs-toggle="modal" data-bs-target="#orderHistoryModal">History</button>
+            <button class="btn btn ms-auto me-3" style="color: white;" data-bs-toggle="modal"
+                data-bs-target="#orderHistoryModal">History</button>
         </div>
     </div>
 </nav>
@@ -23,14 +25,24 @@
             <div class="container my-5">
                 <div class="row g-3 justify-content-center justify-content-md-start">
                     <!-- Menu Item -->
-                    <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch justify-content-center"
-                        *ngFor="let menu of menu_by_type_id">
-                        <div class="card">
-                            <img [src]="'assets/images/menus/' + menu.image" class="card-img-top" alt="{{menu.name}}"
-                                data-bs-toggle="modal" data-bs-target="#menuDetailModal" (click)="sendMenuToCart(menu)">
-                            <div class="card-body d-flex flex-column justify-content-between">
-                                <h5 class="card-title text-dark">{{menu.name}}</h5>
-                                <p class="card-text fw-bold text-price">{{menu.price}}</p>
+                    <div *ngIf="isLoadingMenus" class="loading-container">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">กำลังโหลดเมนู...</span>
+                        </div>
+                    </div>
+                    <div *ngIf="!isLoadingMenus">
+                        <div class="row g-3 justify-content-center justify-content-md-start">
+                            <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch justify-content-center"
+                                *ngFor="let menu of menu_by_type_id">
+                                <div class="card">
+                                    <img [src]="'assets/images/menus/' + menu.image" class="card-img-top"
+                                        alt="{{menu.name}}" data-bs-toggle="modal" data-bs-target="#menuDetailModal"
+                                        (click)="sendMenuToCart(menu)">
+                                    <div class="card-body d-flex flex-column justify-content-between">
+                                        <h5 class="card-title text-dark">{{menu.name}}</h5>
+                                        <p class="card-text fw-bold text-price">{{menu.price}}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -61,7 +73,8 @@
             </div>
             <div class="cart-footer mt-3">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 id="modalTotalPrice" class="fw-bold" style="color: #6F4E37;">รวมทั้งหมด: {{ getTotalPrice() }}฿</h5>
+                    <h5 id="modalTotalPrice" class="fw-bold" style="color: #6F4E37;">รวมทั้งหมด: {{ getTotalPrice() }}฿
+                    </h5>
                     <h5 class="fw-bold" style="color: #6F4E37;">โต๊ะที่: {{ tableByCode || 'Guest' }}</h5>
                 </div>
                 <button id="confirmOrderButton" class="btn w-100 fw-bold"
@@ -108,7 +121,7 @@
                     </li>
                 </ul>
                 <h6 id="modalTotalPrice" class="fw-bold">รวมทั้งหมด: {{ getTotalPrice() }}฿</h6>
-                <h6 id="modalTotalPrice" class="fw-bold">โต๊ะที่: {{ tableByCode }}</h6>
+                <h6 id="modalTotalPrice" class="fw-bold">โต๊ะที่: {{ user }}</h6>
                 <button id="modalConfirmOrderButton" class="btn w-100 fw-bold"
                     style="background-color: #6F4E37; color: white;" (click)="confirmOrder()" data-bs-dismiss="modal">
                     ยืนยันคำสั่ง
@@ -169,7 +182,8 @@
 </div>
 
 <!-- Modal แสดงรายการออเดอร์ของโต๊ะ -->
-<div class="modal fade" id="orderHistoryModal" tabindex="-1" aria-labelledby="orderHistoryModalLabel" aria-hidden="true">
+<div class="modal fade" id="orderHistoryModal" tabindex="-1" aria-labelledby="orderHistoryModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -180,13 +194,22 @@
                 <div *ngIf="tableOrders.length > 0">
                     <div *ngFor="let order of tableOrders">
                         <ul class="list-group mb-3">
-                            <li *ngFor="let item of order.orders_items" class="list-group-item d-flex justify-content-between align-items-center">
+                            <li *ngFor="let item of order.orders_items"
+                                class="list-group-item d-flex justify-content-between align-items-center">
                                 <div>
-                                    <span class="fw-bold">{{ item.menu_name }}</span> x {{ item.menu_qty }} 
+                                    <span class="fw-bold">{{ item.menu_name }}</span> x {{ item.menu_qty }}
                                     <br />
                                     <small class="text-muted">{{ item.menu_note || 'ไม่มีหมายเหตุ' }}</small>
                                     <br />
-                                    <span class="badge bg-secondary">{{ getOrderStatus(item.status_order, item.status_serve) }}</span>
+                                    <span class="badge" [ngClass]="{
+                                        'badge-served': item.status_serve === 1,
+                                        'badge-preparing': item.status_serve !== 1 && item.status_order === 0,
+                                        'badge-cooking': item.status_serve !== 1 && item.status_order === 1,
+                                        'badge-ready': item.status_serve !== 1 && item.status_order === 2
+                                    }">
+                                        {{ getOrderStatus(item.status_order, item.status_serve) }}
+                                    </span>
+
                                 </div>
                                 <span class="badge bg-secondary">{{ item.total }} ฿</span>
                             </li>
