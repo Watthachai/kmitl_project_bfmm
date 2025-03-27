@@ -91,34 +91,39 @@ export class TableStatusComponent implements OnInit {
   
     if (!confirmResult.isConfirmed) return;
   
+    // อัปเดตข้อมูล Payment และ Order ก่อนตรวจสอบ
     await this.fetchOrderAndPayment();
-    const relatedOrder = this.order.find((o: any) => o.table_id === table.table_id);
   
+    const relatedOrder = this.order.find((o: any) => o.table_id === table.table_id);
     if (table.status === 'disable' && relatedOrder) {
       if (!relatedOrder.payment_id) {
         await Swal.fire('ไม่สามารถปิดโต๊ะได้', 'ลูกค้ายังไม่ได้ชำระเงิน กรุณาชำระเงินก่อนปิดโต๊ะ', 'warning');
         return;
       }
   
-      // ให้ผู้ใช้เลือกช่องทางการชำระเงินแทนที่จะบังคับใช้ PromptPay
-      await this.selectPaymentMethod(table);
+      // ตรวจสอบ payment_method ว่ายังเป็น null หรือไม่
+      const paymentInfo = this.payment.find((p: any) => p.payment_id === relatedOrder.payment_id);
+      if (!paymentInfo || paymentInfo.payment_status === 0) {
+        await this.selectPaymentMethod(table);
   
-      // เช็คว่า payment หลังจากเลือกชำระสำเร็จหรือยัง
-      const updatedOrder = this.order.find((o: any) => o.table_id === table.table_id);
-      if (!updatedOrder || !updatedOrder.payment_id || !updatedOrder.payment_method) {
-        await Swal.fire('ไม่สามารถปิดโต๊ะได้', 'กรุณายืนยันการชำระเงินให้เรียบร้อยก่อน', 'warning');
-        return;
+        // อัปเดตข้อมูลอีกครั้งหลังเลือกช่องทางชำระเงิน
+        await this.fetchOrderAndPayment();
+  
+        const updatedPayment = this.payment.find((p: any) => p.payment_id === relatedOrder.payment_id);
+        if (!updatedPayment || updatedPayment.payment_method === null) {
+          await Swal.fire('ไม่สามารถปิดโต๊ะได้', 'กรุณาชำระเงินก่อน', 'warning');
+          return;
+        }
       }
     }
   
-    // อัปเดตสถานะได้
+    // อัปเดตสถานะโต๊ะ
     this.tableStatusService.updateTableStatus(table).subscribe(
       (res: any) => {
         Swal.fire('สำเร็จ', `โต๊ะ ${table.table_id} ถูกอัปเดตแล้ว`, 'success');
   
         this.tableStatusService.getAllTable().subscribe((res) => {
           this.tables = res;
-  
           this.tables.forEach((t: any) => {
             if (t.code) {
               const qrData = `https://kmitlcafe.sirawit.in.th:4200/ordering/1/${t.code}`;
@@ -174,7 +179,7 @@ export class TableStatusComponent implements OnInit {
     }
   
     const { value: paymentMethod } = await Swal.fire({
-      title: '🔹 เลือกช่องทางชำระเงิน',
+      title: 'เลือกช่องทางชำระเงิน',
       html: `
         <div style="display: flex; flex-direction: column; gap: 10px;">
           <button id="cashBtn" class="swal2-confirm swal2-styled" style="background-color: #ffcc00; color: #000; padding: 10px;">เงินสด</button>
