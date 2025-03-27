@@ -191,34 +191,27 @@
                         <tr>
                             <th>วัตถุดิบ</th>
                             <th>จำนวน</th>
-                            <th>อัปเดต</th>
-                            <th>เพิ่มใหม่</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr *ngFor="let item of editItems; let i = index">
                             <td>
-                                <select class="form-select" [(ngModel)]="item.ingredient_id"
-                                    name="edit_ingredient_id_{{i}}">
+                                <select class="form-control" [(ngModel)]="item.ingredient_id"
+                                    name="edit_ingredient_id_{{i}}" disabled>
                                     <option *ngFor="let ing of ingredients" [value]="ing.Ingredients_id">
                                         {{ ing.Ingredients_name }}
                                     </option>
                                 </select>
                             </td>
                             <td>
-                                <input type="number" class="form-control" [(ngModel)]="item.qty" name="edit_qty_{{i}}">
-                            </td>
-                            <td>
-                                <button class="btn btn-primary btn-sm" (click)="updateItem(item)">อัปเดตไอเทม</button>
-                            </td>
-                            <td *ngIf="!item.id">
-                                <button class="btn btn-success btn-sm"
-                                    (click)="submitNewItem(item)">เพิ่มไอเทมใหม่</button>
+                                <input type="number" class="form-control" [(ngModel)]="item.qty" name="edit_qty_{{i}}" disabled>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-                <button class="btn btn-secondary btn-sm" (click)="addNewEditItem()">+ เพิ่มแถวใหม่</button>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">ปิด</button>
             </div>
         </div>
     </div>
