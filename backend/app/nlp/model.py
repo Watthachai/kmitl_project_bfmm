@@ -18,6 +18,7 @@ from app.models.ingredients import Ingredients # Assuming this is your models
 from app.models.menuingredients import MenuIngredients # Assuming this is your models
 from app.models.ingredientpack import IngredientPack
 from app.models.menuingredientpack import MenuIngredientPack
+import resp_from_model as resp_model
 
 # --- Configuration ---
 # Use os.path.expanduser() to handle tilde expansion reliably
@@ -566,3 +567,58 @@ def upload_audio():
 
         except FileNotFoundError:
             pass # If not exits, pass
+
+def predict_resp(txt, flags=0):
+    p_data = get_ner(txt)
+    if(flags==1):
+        return p_data
+    return process_data(p_data)
+
+def convert_predictions_to_json(predictions, text):
+    result = {
+        "data": [],
+        "text": text
+    }
+
+    current_text = ""
+    current_tag = None
+    o_words = []
+
+    for word, _, tag in predictions:
+        if tag.startswith("B-"):
+            if current_text:
+                result["data"].append({
+                    "text": current_text,
+                    "tag": current_tag.split("-")[1] if current_tag else "O"
+                })
+            if o_words:
+                result["data"].append({
+                    "text": "".join(o_words).strip(),
+                    "tag": "O"
+                })
+                o_words = []
+            current_text = word
+            current_tag = tag
+        elif tag.startswith("I-"):
+            current_text += word
+        elif tag == "O":
+            if current_text:
+                result["data"].append({
+                    "text": current_text,
+                    "tag": current_tag.split("-")[1] if current_tag else "O"
+                })
+                current_text = ""
+            o_words.append(word)
+
+    if current_text:
+        result["data"].append({
+            "text": current_text,
+            "tag": current_tag.split("-")[1] if current_tag else "O"
+        })
+    if o_words:
+        result["data"].append({
+            "text": "".join(o_words).strip(),
+            "tag": "O"
+        })
+
+    return result
