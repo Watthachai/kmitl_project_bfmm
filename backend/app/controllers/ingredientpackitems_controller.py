@@ -1,4 +1,6 @@
 from app.models.ingredientpackitems import IngredientPackItems
+from app.models.ingredientpack import IngredientPack
+from app.models.ingredients import Ingredients
 from app import db
 from flask import jsonify, request
 from sqlalchemy.exc import SQLAlchemyError
@@ -24,6 +26,7 @@ def create_ingredient_pack_item():
         if not isinstance(data["qty"], int) or data["qty"] < 0:
             return jsonify({"message": "qty must be a non-negative integer!"}), 400
 
+        # สร้าง IngredientPackItem ใหม่
         new_ingredient_pack_item = IngredientPackItems(
             ingredient_pack_id=data["ingredient_pack_id"],
             ingredient_id=data["ingredient_id"],
@@ -32,7 +35,39 @@ def create_ingredient_pack_item():
         db.session.add(new_ingredient_pack_item)
         db.session.commit()
 
-        return jsonify({"message": "IngredientPackItem created successfully!"}), 201
+        # หา IngredientPack ที่ตรงกับ ingredient_pack_id
+        ingredient_pack = IngredientPack.query.get(data["ingredient_pack_id"])
+        if not ingredient_pack:
+            return jsonify({"message": "IngredientPack not found!"}), 404
+
+        # หาทุก ingredient_pack_item ที่มี ingredient_pack_id ตรงกับ ingredient_pack_id ที่เรากำหนด
+        ingredient_pack_items = IngredientPackItems.query.filter_by(
+            ingredient_pack_id=data["ingredient_pack_id"]
+        ).all()
+
+        # ตัด stock ของวัตถุดิบที่เกี่ยวข้องทั้งหมด
+        for item in ingredient_pack_items:
+            ingredient = Ingredients.query.get(item.ingredient_id)
+            if not ingredient:
+                return jsonify({"message": f"Ingredient with ID {item.ingredient_id} not found!"}), 404
+
+            # คำนวณจำนวนที่ต้องตัดจาก main_stock
+            total_deduction = item.qty * ingredient_pack.stock
+
+            # ตรวจสอบว่า main_stock ของ ingredient มีมากพอหรือไม่
+            if ingredient.main_stock < total_deduction:
+                return jsonify({
+                    "message": f"ไม่สามารถตัด stock ของ {ingredient.Ingredients_name} ได้ เนื่องจาก main_stock มีไม่พอ!"
+                }), 400
+
+            # ตัด stock ใน main_stock ของ ingredients
+            ingredient.main_stock -= total_deduction
+
+        # Commit การอัพเดททุกครั้ง
+        db.session.commit()
+
+        return jsonify({"message": "IngredientPackItem created successfully and stock updated!"}), 201
+
     except SQLAlchemyError as e:
         db.session.rollback()
         return jsonify({"message": f"Database Error: {str(e)}"}), 500
