@@ -33,8 +33,6 @@ export class OrderingComponent implements OnInit{
   tableOrders: any[] = [];
   isLoadingMenus: boolean = false;
 
-
-
   constructor(private router: Router, private route: ActivatedRoute, private service_order: OrderingService, private cdr: ChangeDetectorRef, private tokenStorage: TokenStorageService,
     private tableService : TableStatusService, @Inject(PLATFORM_ID) private platformId: Object, private ngZone: NgZone)
   { 
@@ -73,13 +71,7 @@ export class OrderingComponent implements OnInit{
     });
   
     this.loadCartFromLocalStorage();
-  
-    this.isLoadingMenus = true;
-    this.service_order.getAllMenusById(this.id).subscribe((res) => {
-      this.menu_by_type_id = res;
-      this.isLoadingMenus = false;
-    });
-  
+
     this.service_order.getCategoryById(this.id).subscribe((res) => {
       this.category = res;
     });
@@ -93,6 +85,12 @@ export class OrderingComponent implements OnInit{
         }, 5000);
       });
     }
+  
+    this.isLoadingMenus = true;
+    this.service_order.getAllMenusById(this.id).subscribe((res) => {
+      this.menu_by_type_id = res;
+      this.isLoadingMenus = false;
+    });
   }  
 
   verifyTableCode() {
