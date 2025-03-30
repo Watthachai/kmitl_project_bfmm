@@ -568,6 +568,87 @@ def upload_audio():
         except FileNotFoundError:
             pass # If not exits, pass
 
+def test_predict():
+    """Handles audio file uploads, conversion, and processing."""
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    temp_upload_path = os.path.join(OUTPUT_DIR, file.filename)
+    fixed_wav_path = os.path.join(OUTPUT_DIR, "speech.wav")
+
+    try:
+        with open(temp_upload_path, "wb") as f:
+            f.write(file.read())
+        print(f"File uploaded to: {temp_upload_path}")
+
+        # Use ffmpeg to check file type (more robust than relying on filename extension)
+        ffmpeg_check_cmd = ["ffmpeg", "-i", temp_upload_path]
+        result = subprocess.run(ffmpeg_check_cmd, stderr=subprocess.PIPE, text=True)
+
+        if "matroska,webm" in result.stderr or "opus" in result.stderr:
+            print("⚠️ Detected WebM/Opus file, converting to WAV...")
+            convert_cmd = [
+                "ffmpeg", "-y", "-i", temp_upload_path,
+                "-acodec", "pcm_s16le",  # Ensure consistent WAV format
+                "-ar", "44100",        # Standard sample rate
+                "-ac", "2",             # Stereo (optional, but good for consistency)
+                fixed_wav_path
+            ]
+            subprocess.run(convert_cmd, check=True)  # Raise exception on error
+            print(f"✅ Converted to WAV: {fixed_wav_path}")
+            audio_wav = fixed_wav_path
+
+        elif "mp3" in result.stderr.lower():  # added .lower() to fix
+             print("✅ File is a real MP3, converting MP3 to WAV...")
+             audio = AudioSegment.from_file(temp_upload_path, format="mp3")
+             audio.export(fixed_wav_path, format="wav", parameters=["-acodec", "pcm_s16le"])
+             print(f"✅ Exported WAV file: {fixed_wav_path}")
+             audio_wav = fixed_wav_path
+        else:
+            return jsonify({"error": "Unsupported file format"}), 400 # check support file
+
+        text = recognize_audio(audio_wav)
+        text_new = convert_text(text)
+        # result_data = predict_resp(text_new)
+        predictions = predict_resp(text_new,1)
+        print("predictts:", predictions)
+        text_json = convert_predictions_to_json(predictions, text)
+        print("text_json", text_json)
+
+        # text = "หมึกผัดไข่เค็มโต๊ะ 4 เตรียมแล้ว" #ตรงนี้มาจาก text = recognize_audio(audio_wav)
+        # text_new = convert_text(text)
+        # predictions = resp_model.predict_resp(text_new,1)
+        # print("predictts:", predictions)
+        # text_json = convert_predictions_to_json(predictions, text)
+        # print("text_json", text_json)
+
+        return jsonify({"resp": text_json})
+
+        # Call change_status_order and return its result
+        # return change_status_order(result_data)
+
+
+    except subprocess.CalledProcessError as e:
+        print(f"❌ FFmpeg error: {e}")
+        return jsonify({"error": "FFmpeg conversion failed", "details": str(e)}), 500
+    except Exception as e:
+        print(f"❌ Error during processing: {e}")
+        return jsonify({"error": "An error occurred during processing", "details": str(e)}), 500
+    finally:
+        # Clean up temporary files (optional, but good practice)
+        try:
+            os.remove(temp_upload_path)
+            # Only remove fixed_wav_path if it's different
+            if temp_upload_path != fixed_wav_path:
+                os.remove(fixed_wav_path)
+
+        except FileNotFoundError:
+            pass # If not exits, pass
+
 def predict_resp(txt, flags=0):
     p_data = get_ner(txt)
     if(flags==1):
