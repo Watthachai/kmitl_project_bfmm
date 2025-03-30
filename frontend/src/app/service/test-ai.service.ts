@@ -10,7 +10,7 @@ export class TestAIService {
   constructor(private http: HttpClient) { }
 
   uploadAudio(audioFile: File) {
-      const url = `${environment.serviceUrl}/api/nlp/crf/test_predict/`;
+      const url = `${environment.serviceUrl}/api/nlp/crf/test_predict`;
       const formData = new FormData();
       formData.append('file', audioFile, audioFile.name);
   
