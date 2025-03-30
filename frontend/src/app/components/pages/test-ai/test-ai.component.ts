@@ -98,9 +98,10 @@ export class TestAIComponent implements OnInit{
             if(event.body){
               // console.log(event.body)
               const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-              console.log("result:", body.result);
-              console.log("text:", body.text);
+              // console.log("result:", body.result);
+              // console.log("text:", body.text);
               this.resp = body
+              console.log(this.resp);
             }
         },
         error: error => {
