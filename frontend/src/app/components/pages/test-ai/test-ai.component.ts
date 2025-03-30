@@ -15,8 +15,11 @@ export class TestAIComponent implements OnInit{
   mediaRecorder!: MediaRecorder;
   audioChunks: Blob[] = [];
   stream!: MediaStream;
+  flags: any;
+
   ngOnInit(): void {
     console.log(this.resp)
+    this.flags = 0;
   }
 
   startRecording(): void {
@@ -25,6 +28,7 @@ export class TestAIComponent implements OnInit{
       return;
     }
 
+    this.flags = 1;
     this.resp = null;
     this.cdr.detectChanges(); // บังคับให้อัปเดต UI
     this.isRecording = true;
@@ -92,6 +96,7 @@ export class TestAIComponent implements OnInit{
         },
         complete: () => {
             console.log("อัปโหลดเสียงสำเร็จ");
+            this.flags = 0;
         }
       }
     );

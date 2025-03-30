@@ -46,7 +46,7 @@
         </div>
     </div>
     <!-- เริ่มบันทึก -->
-    <div *ngIf="isRecording && !resp" class="startRecord">
+    <div *ngIf="flags === 1" class="startRecord">
         <button class="btn color-dot-1 dots-animations" disabled>
         </button>
         <button class="btn color-dot-2 dots-animations" disabled>
@@ -61,7 +61,7 @@
         </button>
     </div>
     <!-- ยังไม่บันทึก/หยุดบันทึก -->
-    <div *ngIf="!isRecording" class="stopRecord">
+    <div *ngIf="flags === 0" class="stopRecord">
         <button class="btn color-dot-1 dots" disabled>
         </button>
         <button class="btn color-dot-2 dots" disabled>
