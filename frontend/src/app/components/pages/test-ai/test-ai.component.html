@@ -5,10 +5,18 @@
             style=" height: 45px; border-radius: 35px 0 0 35px; text-align: center; background-color: #FA3F8E; color: #ffffff; border-color: #FA3F8E; font-weight: bold;">
             <div class="px-3">Sentence</div>
         </span>
-        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+        <div *ngIf="!resp">
+            <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
             style="max-width: 400px; height: 45px; border-radius: 0 35px 35px 0; border-color: #FA3F8E; background-color: #ffffff; color: #FA3F8E; font-weight: bold;"
             disabled
-            value="กำลังรอประโยคสำหรับระบุเอนทิตี้...กำลังรอประโยคสำหรับระบุเอนทิตี้...กำลังรอประโยคสำหรับระบุเอนทิตี้...">
+            value="กำลังรอประโยคสำหรับระบุเอนทิตี้">
+        </div>
+        <div *ngIf="resp">
+            <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+            style="max-width: 400px; height: 45px; border-radius: 0 35px 35px 0; border-color: #FA3F8E; background-color: #ffffff; color: #FA3F8E; font-weight: bold;"
+            disabled
+            value="{{ resp.text }}">
+        </div>
     </div>
 
     <div class="container text-center mt-5" style="height: 200px;">
