@@ -19,18 +19,18 @@
         <div class="" *ngIf="resp">
             <div class="mt-5 fade-slide-in-animation">
                 <span *ngFor="let item of resp.data" [ngClass]="{
-          'food-tag': item.tag === 'FOOD',
-          'table-tag': item.tag === 'TABLE',
-          'command-1-tag': item.tag === 'COMMAND_1',
-          'o-tag': item.tag === 'O'
-        }" class="tags">
+                    'food-tag': item.tag === 'FOOD',
+                    'table-tag': item.tag === 'TABLE',
+                    'command-1-tag': item.tag === 'COMMAND_1',
+                    'command-2-tag': item.tag === 'COMMAND_2',
+                    'question-tag': item.tag === 'QUESTION',
+                    'o-tag': item.tag === 'O'
+                }" class="tags">
                     {{ item.text }}
-                    <span *ngIf="item.tag !== 'O'" [ngClass]="{
-            'food-tag-label': item.tag === 'FOOD',
-            'table-tag-label': item.tag === 'TABLE',
-            'command-1-tag-label': item.tag === 'COMMAND_1',
-            'o-tag': item.tag === 'O'
-            }" class="tag-label">
+                    <span *ngIf="item.tag !=='O'" [ngClass]=" { 'food-tag-label' : item.tag==='FOOD' , 'table-tag-label' :
+                        item.tag==='TABLE' , 'command-1-tag-label' : item.tag==='COMMAND_1' , 'command-2-tag-label' :
+                        item.tag==='COMMAND_2' , 'question-tag-label' : item.tag==='QUESTION' , 'o-tag' : item.tag==='O'
+                        }" class="tag-label">
                         {{ item.tag }}
                     </span>
                 </span>
@@ -38,7 +38,7 @@
         </div>
     </div>
     <!-- เริ่มบันทึก -->
-    <div *ngIf="isRecording" class="startRecord" >
+    <div *ngIf="isRecording" class="startRecord">
         <button class="btn color-dot-1 dots-animations" disabled>
         </button>
         <button class="btn color-dot-2 dots-animations" disabled>
