@@ -136,6 +136,15 @@ margin: 2rem auto;
 background-color: #FA3F8E; border-radius: 45px; width: 350px; height: 50px; color: white;
 }
 
+.rotating-image {
+  animation: rotate-clockwise 2s linear infinite; /* กำหนด animation */
+}
+
+@keyframes rotate-clockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); } /* หมุนทวนเข็มนาฬิกา */
+}
+
 
 .fade-in-animation {
 animation: fade-in 1s ease-in-out forwards;
