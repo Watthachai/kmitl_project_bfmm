@@ -26,6 +26,7 @@ export class TestAIComponent implements OnInit{
     }
 
     this.resp = null;
+    this.cdr.detectChanges(); // บังคับให้อัปเดต UI
     this.isRecording = true;
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
