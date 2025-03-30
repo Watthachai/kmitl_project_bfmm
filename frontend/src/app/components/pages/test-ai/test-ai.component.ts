@@ -25,6 +25,7 @@ export class TestAIComponent implements OnInit{
       return;
     }
 
+    this.resp = null;
     this.isRecording = true;
     navigator.mediaDevices.getUserMedia({ audio: true })
       .then(stream => {
