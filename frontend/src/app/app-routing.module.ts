@@ -9,6 +9,7 @@ import { RecipeComponent } from './components/pages/recipe/recipe.component';
 import { IngredientComponent } from './components/pages/ingredient/ingredient.component';
 import { WasteComponent } from './components/pages/waste/waste.component';
 import { HistoryComponent } from './components/pages/history/history.component';
+import { TestAIComponent } from './components/pages/test-ai/test-ai.component';
 
 const routes: Routes = [
   { path: "", component: LoginComponent },
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: "ingredient", component: IngredientComponent, canActivate: [AuthGuard] },
   { path: "waste", component: WasteComponent, canActivate: [AuthGuard] },
   { path: "history", component: HistoryComponent, canActivate: [AuthGuard] },
+  { path: "ai", component: TestAIComponent, canActivate: [AuthGuard] },
 ];
 
 @NgModule({

@@ -1,0 +1,80 @@
+<body class="container text-center fade-slide-in-animation">
+    <h2 class="mt-4" style="color: #FA3F8E; margin-bottom: 40px;">ทดสอบ AI สำหรับการระบุเอนทิตี้</h2>
+    <div class="input-group mb-3 d-flex justify-content-center align-items-center">
+        <span class="input-group-text" id=""
+            style=" height: 45px; border-radius: 35px 0 0 35px; text-align: center; background-color: #FA3F8E; color: #ffffff; border-color: #FA3F8E; font-weight: bold;">
+            <div class="px-3">Sentence</div>
+        </span>
+        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+            style="max-width: 400px; height: 45px; border-radius: 0 35px 35px 0; border-color: #FA3F8E; background-color: #ffffff; color: #FA3F8E; font-weight: bold;"
+            disabled
+            value="กำลังรอประโยคสำหรับระบุเอนทิตี้...กำลังรอประโยคสำหรับระบุเอนทิตี้...กำลังรอประโยคสำหรับระบุเอนทิตี้...">
+    </div>
+
+    <div class="container text-center mt-5" style="height: 200px;">
+
+        <div *ngIf="!resp">
+            <img src="assets/images/ai_waiting_img.png" class="sleeping-robot img-fluid" style="height: 150px;">
+        </div>
+        <div class="" *ngIf="resp">
+            <div class="mt-5 fade-slide-in-animation">
+                <span *ngFor="let item of resp.data" [ngClass]="{
+          'food-tag': item.tag === 'FOOD',
+          'table-tag': item.tag === 'TABLE',
+          'command-1-tag': item.tag === 'COMMAND_1',
+          'o-tag': item.tag === 'O'
+        }" class="tags">
+                    {{ item.text }}
+                    <span *ngIf="item.tag !== 'O'" [ngClass]="{
+            'food-tag-label': item.tag === 'FOOD',
+            'table-tag-label': item.tag === 'TABLE',
+            'command-1-tag-label': item.tag === 'COMMAND_1',
+            'o-tag': item.tag === 'O'
+            }" class="tag-label">
+                        {{ item.tag }}
+                    </span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <!-- เริ่มบันทึก -->
+    <div *ngIf="isRecording" class="startRecord" >
+        <button class="btn color-dot-1 dots-animations" disabled>
+        </button>
+        <button class="btn color-dot-2 dots-animations" disabled>
+        </button>
+        <button class="btn color-dot-3 dots-animations" disabled>
+        </button>
+        <button class="btn color-dot-4 dots-animations" disabled>
+        </button>
+        <button class="btn color-dot-5 dots-animations" disabled>
+        </button>
+        <button class="btn color-dot-6 dots-animations" disabled>
+        </button>
+    </div>
+    <!-- ยังไม่บันทึก/หยุดบันทึก -->
+    <div *ngIf="!isRecording" class="stopRecord">
+        <button class="btn color-dot-1 dots" disabled>
+        </button>
+        <button class="btn color-dot-2 dots" disabled>
+        </button>
+        <button class="btn color-dot-3 dots" disabled>
+        </button>
+        <button class="btn color-dot-4 dots" disabled>
+        </button>
+        <button class="btn color-dot-5 dots" disabled>
+        </button>
+        <button class="btn color-dot-6 dots" disabled>
+        </button>
+    </div>
+
+    <!-- <button class="btn mt-5 btn-record">บันทึก</button> -->
+    <div class="audio-record-container">
+        <button *ngIf="!isRecording" (click)="startRecording()" class="btn mt-5 btn-record">
+            เริ่มบันทึกเสียง
+        </button>
+        <button *ngIf="isRecording" (click)="stopRecording()" class="btn mt-5 btn-record">
+            หยุดบันทึก
+        </button>
+    </div>
+</body>

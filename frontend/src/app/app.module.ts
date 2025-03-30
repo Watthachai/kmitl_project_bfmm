@@ -16,6 +16,7 @@ import { IngredientComponent } from './components/pages/ingredient/ingredient.co
 import { WasteComponent } from './components/pages/waste/waste.component';
 import { HistoryComponent } from './components/pages/history/history.component';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { TestAIComponent } from './components/pages/test-ai/test-ai.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
     IngredientComponent,
     WasteComponent,
     HistoryComponent,
+    TestAIComponent
   ],
   imports: [
     BrowserModule,
