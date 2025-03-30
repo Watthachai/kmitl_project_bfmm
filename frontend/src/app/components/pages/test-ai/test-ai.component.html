@@ -15,7 +15,7 @@
             <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3"
             style="max-width: 400px; height: 45px; border-radius: 0 35px 35px 0; border-color: #FA3F8E; background-color: #ffffff; color: #FA3F8E; font-weight: bold;"
             disabled
-            value="{{ resp.text }}">
+            value="{{ resp.resp.text }}">
         </div>
     </div>
 
@@ -26,7 +26,7 @@
         </div>
         <div class="" *ngIf="resp">
             <div class="mt-5 fade-slide-in-animation">
-                <span *ngFor="let item of resp.data" [ngClass]="{
+                <span *ngFor="let item of resp.resp.data" [ngClass]="{
                     'food-tag': item.tag === 'FOOD',
                     'table-tag': item.tag === 'TABLE',
                     'command-1-tag': item.tag === 'COMMAND_1',
