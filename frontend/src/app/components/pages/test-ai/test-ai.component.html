@@ -21,10 +21,10 @@
 
     <div class="container text-center mt-5" style="height: 200px;">
 
-        <div *ngIf="!resp || flags === 0">
+        <div *ngIf="!resp && flags === 0">
             <img src="assets/images/ai_waiting_img.png" class="sleeping-robot img-fluid" style="height: 150px;">
         </div>
-        <div *ngIf="!resp || flags === 1">
+        <div *ngIf="!resp && flags === 1">
             <img src="assets/images/loading-wtf.gif" class="sleeping-robot img-fluid" style="height: 150px;">
         </div>
         <div class="" *ngIf="resp">
