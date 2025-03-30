@@ -16,7 +16,7 @@ export class TestAIComponent implements OnInit{
   audioChunks: Blob[] = [];
   stream!: MediaStream;
   ngOnInit(): void {
-    // this.resp = {'data': [{'text': 'หมึกผัดไข่เค็ม', 'tag': 'FOOD'}, {'text': 'โต๊ะ4', 'tag': 'TABLE'}, {'text': 'เตรียมแล้ว', 'tag': 'COMMAND_1'}], 'text': 'หมึกผัดไข่เค็มโต๊ะ 4 เตรียมแล้ว'}
+    console.log(this.resp)
   }
 
   startRecording(): void {
@@ -75,35 +75,16 @@ export class TestAIComponent implements OnInit{
   uploadAudio(audioFile: File): void {
     console.log("กำลังส่งไฟล์เสียงไป API...");
     console.log("รายละเอียดไฟล์:", audioFile);
-    // this.resp = {'data': [{'text': 'หมึกผัดไข่เค็ม', 'tag': 'FOOD'}, {'text': 'โต๊ะ4', 'tag': 'TABLE'}, {'text': 'เตรียมแล้ว', 'tag': 'COMMAND_1'}], 'text': 'หมึกผัดไข่เค็มโต๊ะ 4 เตรียมแล้ว'}
-    // console.log(this.resp);
-    // this.cdr.detectChanges();
-
-
-    // this.service.getAllMenuTypes().subscribe((res) => {
-    //   this.menu_types = res;
-    //   console.log('Menu Types:', this.menu_types);
-    // });
-    // this.service.uploadAudio(audioFile).subscribe((res) => {
-    //   console.log(res)
-
-    // })
-
-    // ส่วนส่งข้อมูลไปหา API
-
     this.service.uploadAudio(audioFile).subscribe({
-
-        next: event => {
-            // console.log("สถานะการอัปโหลด:", event);
-            if(event.body){
-              // console.log(event.body)
-              const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-              // console.log("result:", body.result);
-              // console.log("text:", body.text);
-              this.resp = body
-              console.log(this.resp);
-            }
-        },
+      next: event => {
+        if (event.body) {
+          const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+          console.log("ข้อมูลที่ได้รับจาก API:", body); // ตรวจสอบข้อมูล
+          this.resp = body;
+          console.log("ค่า resp ที่กำหนด:", this.resp); // ตรวจสอบค่า resp
+          this.cdr.detectChanges(); // บังคับให้อัปเดต UI
+        }
+      },
         error: error => {
             console.error("เกิดข้อผิดพลาดในการอัปโหลดเสียง:", error);
         },
