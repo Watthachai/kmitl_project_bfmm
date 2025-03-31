@@ -8,7 +8,9 @@
   font-size: 15px;
   padding-left: 13px;
 }
-
+.o-tag {
+  color: black;
+}
 .food-tag {
   background-color: #7c2ae8;
 }
