@@ -7,7 +7,7 @@ services:
       - "5000:5000"
     environment:
       - DB_HOST=db
-      - DB_USER=root # Corrected user
+      - DB_USER=kmitl_project # Corrected user
       - DB_PASSWORD=kmitl_project  # Corrected password
       - DB_NAME=kmitl_project
       - FLASK_DEBUG=1  # 1 for development, 0 for production
@@ -28,16 +28,19 @@ services:
   db:
     image: mysql:8.0
     ports:
-      - "3306:3306"
+      - "3310:3306"
     environment:
       MYSQL_ROOT_PASSWORD: kmitl_project
       MYSQL_DATABASE: kmitl_project
-      MYSQL_USER: root
+      MYSQL_USER: kmitl_project
       MYSQL_PASSWORD: kmitl_project
     volumes:
       - db_data:/var/lib/mysql
       - ./db:/docker-entrypoint-initdb.d
     command: --default-authentication-plugin=mysql_native_password
+    # Added configuration for external access to the database
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
 volumes:
   db_data:
