@@ -1,4 +1,4 @@
-FROM node:18-alpine as build
+FROM node:latest-alpine as build
 
 WORKDIR /app
 
@@ -8,6 +8,11 @@ RUN npm install -g @angular/cli && npm install
 
 COPY . .
 
-EXPOSE 4200
+# Build the application
+RUN ng build
 
-CMD ["ng", "serve", "--host", "0.0.0.0"]
+# Default to port 4200, but can be overridden
+EXPOSE 4200 
+
+# Run the server with HTTPS enabled
+CMD ["sh", "-c", "USE_HTTPS=true node dist/test-project-app/server/server.mjs"]
