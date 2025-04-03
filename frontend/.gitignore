@@ -1,3 +1,5 @@
+frontend\ssl
+
 # Angular related
 node_modules/
 dist/
