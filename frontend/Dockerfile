@@ -1,8 +1,8 @@
-FROM node:latest-alpine as build
+FROM node:slim as build
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 
 RUN npm install -g @angular/cli && npm install
 
@@ -15,4 +15,6 @@ RUN ng build
 EXPOSE 4200 
 
 # Run the server with HTTPS enabled
-CMD ["sh", "-c", "USE_HTTPS=true node dist/test-project-app/server/server.mjs"]
+#CMD ["sh", "-c", "USE_HTTPS=true node dist/test-project-app/server/server.mjs"]
+# Run the server with HTTPS enabled
+CMD ["sh", "-c", "node dist/test-project-app/server/server.mjs"]

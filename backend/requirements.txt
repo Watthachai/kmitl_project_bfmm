@@ -47,3 +47,4 @@ tzdata
 urllib3
 pydub
 pytz
+rapidfuzz

@@ -1,3 +1,3 @@
 export const environment = {
-    serviceUrl: "http://kmitlcafe.sirawit.in.th:5000" 
+    serviceUrl: "http://localhost:5000" 
 };

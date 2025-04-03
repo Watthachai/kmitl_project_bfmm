@@ -22,10 +22,10 @@ from app.models.menuingredientpack import MenuIngredientPack
 
 # --- Configuration ---
 # Use os.path.expanduser() to handle tilde expansion reliably
-BASE_DIR = os.path.expanduser("~/kmitl_project_bfmm/backend/app")
+BASE_DIR = os.path.expanduser("/backend/app")
 NLP_DIR = os.path.join(BASE_DIR, "nlp")
 OUTPUT_DIR = os.path.join(NLP_DIR, "output")
-MODEL_PATH = os.path.join(NLP_DIR, "crf_model_ner_v1")
+MODEL_PATH = os.path.join(os.path.dirname(__file__), "crf_model_ner_v1")
 
 # Ensure output directory exists
 os.makedirs(OUTPUT_DIR, exist_ok=True)

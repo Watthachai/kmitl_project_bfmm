@@ -17,7 +17,7 @@
         </div>
         <div class="col-md-3 col-sm-6" *ngFor="let menu of menu_by_type_id">
             <div class="menu-item" (click)="openEditMenuModal(menu)">
-                <img [src]="'https://kmitlcafe.sirawit.in.th:5000/static/images/menus/' + menu.image" class="card-img-top" alt="{{menu.name}}">
+                <img [src]="'http://localhost:5000/static/images/menus/' + menu.image" class="card-img-top" alt="{{menu.name}}">
                 <p class="text-center fw-bold">{{menu.name}}</p>
             </div>
         </div>

@@ -1,17 +1,23 @@
-# ใช้ Python base image (latest)
-FROM python:latest-alpine
+FROM python:3.9-slim-buster
 
-# คัดลอกไฟล์ requirements.txt
-COPY requirements.txt .
+WORKDIR /app
 
-# อัปเดต pip และติดตั้ง dependencies
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libasound2-dev \
+    portaudio19-dev \
+    ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
-# คัดลอกโค้ด Flask ทั้งหมดเข้า container
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt  # --no-cache-dir is important for smaller images
+
 COPY . .
 
-# Expose port 5000 for HTTPS Flask server
+# Expose port 5000 (Flask's default)
 EXPOSE 5000
 
-# ใช้ Flask run with HTTPS
-CMD ["flask", "run", "--host=0.0.0.0", "--port=5000", "--cert=cert.pem", "--key=key.pem"]
+CMD ["flask", "run", "--host=localhost", "--port=5000",]
+# Alternatively, if you don't want to use Gunicorn inside the container:
+# CMD ["flask", "run", "--host=0.0.0.0"]  # Less robust, good for quick testing

@@ -33,7 +33,7 @@ export class TableStatusComponent implements OnInit {
       this.tables.forEach((t: any) => {
         if (t.code) {
           // const qrData = `kmitlcafe.sirawit.in.th/ordering/1/${t.code}`;
-          const qrData = `https://kmitlcafe.sirawit.in.th:4200/ordering/1/${t.code}`;
+          const qrData = `:4200/ordering/1/${t.code}`;
           t.url = qrData
           t.image = this.sanitizer.bypassSecurityTrustUrl(
             `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=200x200`
@@ -126,7 +126,7 @@ export class TableStatusComponent implements OnInit {
           this.tables = res;
           this.tables.forEach((t: any) => {
             if (t.code) {
-              const qrData = `https://kmitlcafe.sirawit.in.th:4200/ordering/1/${t.code}`;
+              const qrData = `:4200/ordering/1/${t.code}`;
               t.url = qrData;
               t.image = this.sanitizer.bypassSecurityTrustUrl(
                 `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=200x200`
@@ -159,7 +159,7 @@ export class TableStatusComponent implements OnInit {
         const storedCode = localStorage.getItem(`table_qr_${t.table_id}`);
         if (storedCode) {
           // const qrData = `kmitlcafe.sirawit.in.th/ordering/1/${storedCode}`;
-          const qrData = `https://kmitlcafe.sirawit.in.th:4200/ordering/1/${storedCode}`;
+          const qrData = `:4200/ordering/1/${storedCode}`;
           this.qrCodes[t.table_id] = this.sanitizer.bypassSecurityTrustUrl(
             `https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(qrData)}&size=200x200`
           );

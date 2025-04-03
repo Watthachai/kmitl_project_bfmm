@@ -7,10 +7,12 @@ services:
       - "5000:5000"
     environment:
       - DB_HOST=db
-      - DB_USER=kmitl_project_user
-      - DB_PASSWORD=kmitl_project_password  # Corrected password
-      - DB_NAME=kmitl_project_db
+      - DB_USER=root # Corrected user
+      - DB_PASSWORD=kmitl_project  # Corrected password
+      - DB_NAME=kmitl_project
       - FLASK_DEBUG=1  # 1 for development, 0 for production
+      - SECRET_KEY=your_secret_key_here
+      - JWT_SECRET_KEY=your_jwt_secret_key_here
     depends_on:
       - db
     volumes:
@@ -28,10 +30,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: kmitl_project_root
-      MYSQL_DATABASE: kmitl_project_db
-      MYSQL_USER: kmitl_project_user
-      MYSQL_PASSWORD: kmitl_project_password
+      MYSQL_ROOT_PASSWORD: kmitl_project
+      MYSQL_DATABASE: kmitl_project
+      MYSQL_USER: root
+      MYSQL_PASSWORD: kmitl_project
     volumes:
       - db_data:/var/lib/mysql
       - ./db:/docker-entrypoint-initdb.d

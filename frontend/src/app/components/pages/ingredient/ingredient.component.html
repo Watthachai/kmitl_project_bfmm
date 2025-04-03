@@ -62,7 +62,7 @@
                         </td>
                     </tr>
                     <tr *ngFor="let ing of ingredients">
-                        <td><img [src]="'https://kmitlcafe.sirawit.in.th:5000/static/images/ingredients/' + ing.Ingredients_image" width="70" style="height: 70px;"></td>
+                        <td><img [src]="'http://localhost:5000/static/images/ingredients/' + ing.Ingredients_image" width="70" style="height: 70px;"></td>
                         <td>{{ ing.Ingredients_name }}</td>
                         <td>{{ ing.Ingredients_des }}</td>
                         <td>{{ selectedStockField === 'main_stock' ? ing.main_stock : ing.sub_stock }}</td>
